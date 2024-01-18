@@ -87,7 +87,7 @@ function App() {
         }
       }}
     >
-      <BrowserRouter>
+      <BrowserRouter basename="/awaiters-sis-cform">
         <Routes>
           <Route
             path="/:section/login"
