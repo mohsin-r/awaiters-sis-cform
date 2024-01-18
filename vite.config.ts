@@ -6,6 +6,7 @@ import mkcert from 'vite-plugin-mkcert'
 
 // https://vitejs.dev/config https://vitest.dev/config
 export default defineConfig({
+  base: '/awaiters-sis-cform/',
   plugins: [react(), tsconfigPaths(), mkcert()],
   test: {
     globals: true,
