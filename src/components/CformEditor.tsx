@@ -41,7 +41,7 @@ export default function CformEditor(props: { mode: string }) {
   const [notFound, setNotFound] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [messageApi, contextHolder] = message.useMessage()
-  const host = 'https://awaiters-sis-cform-api.onrender.com'
+  const host = 'https://awaiters-sis-cform-api.onrender.com/api'
   const navigate = useNavigate()
   const params = useParams()
 
