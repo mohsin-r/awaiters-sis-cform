@@ -81,7 +81,7 @@ const StudentTable = (props: {
     if (index !== -1) {
       const studentsCopy = [...props.students]
       studentsCopy.splice(index, 1)
-      const host = 'https://awaiters-sis-cform-api.onrender.com/api'
+      const host = 'https://awaiters-sis-cform-api.onrender.com'
       props.setStudents(studentsCopy)
       setUsingDb(true)
       fetch(`${host}/people`, {
@@ -120,7 +120,7 @@ const StudentTable = (props: {
         })
         props.setStudents(newData)
         setUsingDb(true)
-        const host = 'https://awaiters-sis-cform-api.onrender.com/api'
+        const host = 'https://awaiters-sis-cform-api.onrender.com'
         fetch(`${host}/people`, {
           method: 'put',
           body: JSON.stringify({
@@ -262,7 +262,7 @@ function Sis() {
   const [loading, setLoading] = useState(false)
   useEffect(() => {
     setLoading(true)
-    const host = 'https://awaiters-sis-cform-api.onrender.com/api'
+    const host = 'https://awaiters-sis-cform-api.onrender.com'
     fetch(`${host}/people/student`, {
       // @ts-expect-error TS BEING DUMB
       headers: {

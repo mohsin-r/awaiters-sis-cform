@@ -60,7 +60,7 @@ function Cform() {
 
   useEffect(() => {
     setLoading(true)
-    const host = 'https://awaiters-sis-cform-api.onrender.com/api'
+    const host = 'https://awaiters-sis-cform-api.onrender.com'
     fetch(`${host}/dates`, {
       // @ts-expect-error TS BEING DUMB
       headers: {
@@ -96,7 +96,7 @@ function Cform() {
     if (index !== -1) {
       const datesCopy = [...dates]
       datesCopy.splice(index, 1)
-      const host = 'https://awaiters-sis-cform-api.onrender.com/api'
+      const host = 'https://awaiters-sis-cform-api.onrender.com'
       setDates(datesCopy)
       setDeleting(true)
       await fetch(`${host}/coverage`, {

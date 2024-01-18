@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Menu } from 'antd'
 import type { MenuProps } from 'antd'
+import { useLocation } from 'react-router-dom'
 import {
   FormOutlined,
   LogoutOutlined,
@@ -11,6 +12,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 function Navbar(props: any) {
   const navigate = useNavigate()
+  const location = useLocation()
   const params = useParams()
   const items: MenuProps['items'] = [
     {
@@ -38,7 +40,7 @@ function Navbar(props: any) {
   ]
 
   const [current, setCurrent] = useState(() => {
-    if (window.location.href.includes('sis')) {
+    if (location.pathname.includes('sis')) {
       return 'sis'
     } else {
       return 'cform'
@@ -52,7 +54,7 @@ function Navbar(props: any) {
     } else if (e.key === 'cform') {
       navigate(`/${params.section}/cform`)
     } else {
-      const host = 'https://awaiters-sis-cform-api.onrender.com/api'
+      const host = 'https://awaiters-sis-cform-api.onrender.com'
       const request = new Request(`${host}/logout`, {
         method: 'post',
         headers: {

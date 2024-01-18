@@ -19,7 +19,7 @@ export default function AddStudent(props: {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleSubmit = (values: any) => {
-    const host = 'https://awaiters-sis-cform-api.onrender.com/api'
+    const host = 'https://awaiters-sis-cform-api.onrender.com'
     setLoading(true)
     fetch(`${host}/people`, {
       method: 'post',
