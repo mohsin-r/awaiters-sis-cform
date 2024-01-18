@@ -52,7 +52,7 @@ function Navbar(props: any) {
     } else if (e.key === 'cform') {
       navigate(`/${params.section}/cform`)
     } else {
-      const host = import.meta.env.VITE_API_HOST
+      const host = 'https://awaiters-sis-cform-api.onrender.com/api'
       const request = new Request(`${host}/logout`, {
         method: 'post',
         headers: {

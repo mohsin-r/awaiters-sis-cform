@@ -60,7 +60,7 @@ function Cform() {
 
   useEffect(() => {
     setLoading(true)
-    const host = import.meta.env.VITE_API_HOST
+    const host = 'https://awaiters-sis-cform-api.onrender.com/api'
     fetch(`${host}/dates`, {
       // @ts-expect-error TS BEING DUMB
       headers: {
@@ -96,7 +96,7 @@ function Cform() {
     if (index !== -1) {
       const datesCopy = [...dates]
       datesCopy.splice(index, 1)
-      const host = import.meta.env.VITE_API_HOST
+      const host = 'https://awaiters-sis-cform-api.onrender.com/api'
       setDates(datesCopy)
       setDeleting(true)
       await fetch(`${host}/coverage`, {

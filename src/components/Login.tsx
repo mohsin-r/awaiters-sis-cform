@@ -9,7 +9,7 @@ function Login(props: any) {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [messageApi, contextHolder] = message.useMessage()
-  const host = import.meta.env.VITE_API_HOST
+  const host = 'https://awaiters-sis-cform-api.onrender.com/api'
   const onFinish = (values: any) => {
     messageApi.open({
       type: 'loading',
