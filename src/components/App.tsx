@@ -5,15 +5,15 @@ import {
   Navigate,
   useParams
 } from 'react-router-dom'
-import { useState } from 'react'
-import { ConfigProvider } from 'antd'
+import { useEffect, useState } from 'react'
+import { ConfigProvider, Flex, Spin } from 'antd'
 import Layout from 'components/Layout'
 import Sis from 'components/Sis'
 import Cform from 'components/Cform'
 import CformEditor from 'components/CformEditor'
 
 import Login from 'components/Login'
-// import { getCookie } from 'utils'
+import { getCookie, host } from 'utils'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function RequireAuth(props: { class: string | undefined; children: any }) {
@@ -24,18 +24,19 @@ function RequireAuth(props: { class: string | undefined; children: any }) {
   return props.children
 }
 
-/* function AlreadyLoggedIn(props) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function AlreadyLoggedIn(props: { class: string | undefined; children: any }) {
   const params = useParams()
-  if (props.section === params.section) {
-    return <Navigate to={`/${params.section}/sis`} />
+  if (props.class === params.section) {
+    return <Navigate to={`/${params.section}/cform`} />
   }
   return props.children
-} */
+}
 
 function App() {
   const [section, setSection] = useState('')
-  // const host = import.meta.env.VITE_API_HOST
-  /* useEffect(() => {
+  const [loaded, setLoaded] = useState(false)
+  useEffect(() => {
     fetch(`${host}/check-session`, {
       // @ts-expect-error TS BEING DUMB
       headers: {
@@ -50,18 +51,16 @@ function App() {
           return res.json()
         } else {
           setSection('')
+          setLoaded(true)
         }
       })
       .then((json) => {
         if (json) {
-          console.log(json.class)
           setSection(json.class)
+          setLoaded(true)
         }
       })
-      .catch((error) => {
-        console.log(error)
-      })
-  }, []) */
+  }, [])
   return (
     <ConfigProvider
       theme={{
@@ -87,34 +86,56 @@ function App() {
         }
       }}
     >
-      <BrowserRouter>
-        <Routes>
-          <Route
-            path="/:section/login"
-            element={<Login setSection={setSection} />}
-          />
-          <Route
-            path="/:section/"
-            element={
-              <RequireAuth class={section}>
-                <Layout setSection={setSection} />
-              </RequireAuth>
-            }
-          >
-            <Route path="sis" element={<Sis />} />
-            <Route path="cform" element={<Cform />} />
-            <Route path="cform/new" element={<CformEditor mode="new" />} />
+      {!loaded && (
+        <Flex
+          gap="small"
+          className="h-screen w-screen text-[#3b7273]"
+          vertical
+          align="center"
+          justify="center"
+        >
+          <Spin size="large"></Spin>
+          <h3 className="m-0 p-0">Loading...</h3>
+          <p className="m-0 p-0">
+            This will take a while (maybe a minute or so) due to free version
+            limits
+          </p>
+        </Flex>
+      )}
+      {loaded && (
+        <BrowserRouter>
+          <Routes>
             <Route
-              path="cform/view/:date"
-              element={<CformEditor mode="view" />}
+              path="/:section/login"
+              element={
+                <AlreadyLoggedIn class={section}>
+                  <Login setSection={setSection} />
+                </AlreadyLoggedIn>
+              }
             />
             <Route
-              path="cform/edit/:date"
-              element={<CformEditor mode="edit" />}
-            />
-          </Route>
-        </Routes>
-      </BrowserRouter>
+              path="/:section/"
+              element={
+                <RequireAuth class={section}>
+                  <Layout setSection={setSection} />
+                </RequireAuth>
+              }
+            >
+              <Route path="sis" element={<Sis />} />
+              <Route path="cform" element={<Cform />} />
+              <Route path="cform/new" element={<CformEditor mode="new" />} />
+              <Route
+                path="cform/view/:date"
+                element={<CformEditor mode="view" />}
+              />
+              <Route
+                path="cform/edit/:date"
+                element={<CformEditor mode="edit" />}
+              />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+      )}
     </ConfigProvider>
   )
 }

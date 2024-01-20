@@ -24,7 +24,10 @@ interface Student {
   name: string
   late: number
   ayahs: number
-  homework: boolean
+  quranHomework: boolean
+  ideologyHomework: boolean
+  historyHomework: boolean
+  akhlaqHomework: boolean
 }
 
 export default function CformEditor(props: { mode: string }) {
@@ -33,10 +36,10 @@ export default function CformEditor(props: { mode: string }) {
   const [date, setDate] = useState('' as any)
   const [start, setStart] = useState('' as any)
   const [end, setEnd] = useState('' as any)
-  const [quran, setQuran] = useState('')
-  const [generalTopic, setGeneralTopic] = useState('')
-  const [akhlaqAhkam, setAkhlaqAhkam] = useState('')
-  const [others, setOthers] = useState('')
+  const [quranArabic, setQuranArabic] = useState('')
+  const [ideology, setIdeology] = useState('')
+  const [history, setHistory] = useState('')
+  const [akhlaq, setAkhlaq] = useState('')
   const [loaded, setLoaded] = useState(false)
   const [notFound, setNotFound] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -51,10 +54,10 @@ export default function CformEditor(props: { mode: string }) {
         date: values.date,
         start: values.start || undefined,
         end: values.end || undefined,
-        quran: values.quran,
-        generalTopic: values.generalTopic,
-        akhlaqAhkam: values.akhlaqAhkam,
-        others: values.others
+        quranArabic: values.quranArabic,
+        ideology: values.ideology,
+        history: values.history,
+        akhlaq: values.akhlaq
       }),
       // @ts-expect-error bad TS
       headers: {
@@ -75,10 +78,10 @@ export default function CformEditor(props: { mode: string }) {
           date: values.date,
           start: values.start || undefined,
           end: values.end || undefined,
-          quran: values.quran,
-          generalTopic: values.generalTopic,
-          akhlaqAhkam: values.akhlaqAhkam,
-          others: values.others
+          quranArabic: values.quranArabic,
+          ideology: values.ideology,
+          history: values.history,
+          akhlaq: values.akhlaq
         }
       }),
       // @ts-expect-error bad TS
@@ -109,10 +112,10 @@ export default function CformEditor(props: { mode: string }) {
       if (json.end) {
         setEnd(dayjs(json.end, 'h:mmA'))
       }
-      setQuran(json.quran)
-      setGeneralTopic(json.generalTopic)
-      setAkhlaqAhkam(json.akhlaqAhkam)
-      setOthers(json.others)
+      setQuranArabic(json.quranArabic)
+      setIdeology(json.ideology)
+      setHistory(json.history)
+      setAkhlaq(json.akhlaq)
     }
     const progress = await fetch(`${host}/progress/${params.date}`, {
       // @ts-expect-error bad TS
@@ -156,7 +159,10 @@ export default function CformEditor(props: { mode: string }) {
         delete student.phone
         student.ayahs = 0
         student.late = 0
-        student.homework = true
+        student.quranHomework = true
+        student.ideologyHomework = true
+        student.historyHomework = true
+        student.akhlaqHomework = true
         return student
       })
     )
@@ -315,10 +321,10 @@ export default function CformEditor(props: { mode: string }) {
             date: date,
             start: start,
             end: end,
-            quran: quran,
-            generalTopic: generalTopic,
-            akhlaqAhkam: akhlaqAhkam,
-            others: others,
+            quranArabic: quranArabic,
+            ideology: ideology,
+            history: history,
+            akhlaq: akhlaq,
             students: students
           }}
           onFinish={handleSubmit}
@@ -346,32 +352,36 @@ export default function CformEditor(props: { mode: string }) {
             className="flex-wrap gap-y-1"
           >
             <Form.Item
-              label="Quran"
-              name="quran"
+              className="w-80"
+              label="Quran/Arabic"
+              name="quranArabic"
               labelCol={{ span: 24 }}
               wrapperCol={{ span: 24 }}
             >
               <Input.TextArea />
             </Form.Item>
             <Form.Item
-              label="General Topic"
-              name="generalTopic"
+              className="w-80"
+              label="Ideology"
+              name="ideology"
               labelCol={{ span: 24 }}
               wrapperCol={{ span: 24 }}
             >
               <Input.TextArea />
             </Form.Item>
             <Form.Item
-              label="Akhlaq/Ahkam"
-              name="akhlaqAhkam"
+              className="w-80"
+              label="History"
+              name="history"
               labelCol={{ span: 24 }}
               wrapperCol={{ span: 24 }}
             >
               <Input.TextArea />
             </Form.Item>
             <Form.Item
-              label="Others"
-              name="others"
+              className="w-80"
+              label="Akhlaq"
+              name="akhlaq"
               labelCol={{ span: 24 }}
               wrapperCol={{ span: 24 }}
             >
@@ -397,8 +407,32 @@ export default function CformEditor(props: { mode: string }) {
                       <InputNumber />
                     </Form.Item>
                     <Form.Item
-                      label="Homework Done"
-                      name={[field.name, 'homework']}
+                      label="Quran/Arabic H/W Complete"
+                      name={[field.name, 'quranHomework']}
+                      valuePropName="checked"
+                      className="mb-0"
+                    >
+                      <Checkbox />
+                    </Form.Item>
+                    <Form.Item
+                      label="Ideology H/W Complete"
+                      name={[field.name, 'ideologyHomework']}
+                      valuePropName="checked"
+                      className="mb-0"
+                    >
+                      <Checkbox />
+                    </Form.Item>
+                    <Form.Item
+                      label="History H/W Complete"
+                      name={[field.name, 'historyHomework']}
+                      valuePropName="checked"
+                      className="mb-0"
+                    >
+                      <Checkbox />
+                    </Form.Item>
+                    <Form.Item
+                      label="Akhlaq H/W Complete"
+                      name={[field.name, 'akhlaqHomework']}
                       valuePropName="checked"
                       className="mb-0"
                     >
