@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { Button, Table, Space, Typography, Popconfirm } from 'antd'
 import type { TableProps } from 'antd'
 import { useEffect, useState } from 'react'
-import { getCookie } from 'utils'
+import { getCookie, host } from 'utils'
 
 interface DataType {
   key: string
@@ -60,7 +60,6 @@ function Cform() {
 
   useEffect(() => {
     setLoading(true)
-    const host = 'https://awaiters-sis-cform-api.onrender.com/api'
     fetch(`${host}/dates`, {
       // @ts-expect-error TS BEING DUMB
       headers: {
@@ -96,7 +95,6 @@ function Cform() {
     if (index !== -1) {
       const datesCopy = [...dates]
       datesCopy.splice(index, 1)
-      const host = 'https://awaiters-sis-cform-api.onrender.com/api'
       setDates(datesCopy)
       setDeleting(true)
       await fetch(`${host}/coverage`, {

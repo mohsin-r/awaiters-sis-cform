@@ -2,7 +2,7 @@
 import { Button, Modal, Form, Input, message } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 import { useState } from 'react'
-import { getCookie } from 'utils'
+import { getCookie, host } from 'utils'
 
 export default function AddStudent(props: {
   students: Array<any>
@@ -19,7 +19,6 @@ export default function AddStudent(props: {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleSubmit = (values: any) => {
-    const host = 'https://awaiters-sis-cform-api.onrender.com/api'
     setLoading(true)
     fetch(`${host}/people`, {
       method: 'post',

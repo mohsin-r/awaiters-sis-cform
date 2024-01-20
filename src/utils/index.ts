@@ -10,3 +10,5 @@ export function getCookie(name: string) {
     return parts.pop().split(';').shift()
   }
 }
+
+export const host = 'http://localhost:5000/api'

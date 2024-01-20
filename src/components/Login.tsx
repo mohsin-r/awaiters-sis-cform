@@ -3,13 +3,13 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { Button, Form, Input, message } from 'antd'
 import logo from 'assets/logo.png'
 import { useState } from 'react'
+import { host } from 'utils'
 
 function Login(props: any) {
   const { section } = useParams()
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [messageApi, contextHolder] = message.useMessage()
-  const host = 'https://awaiters-sis-cform-api.onrender.com/api'
   const onFinish = (values: any) => {
     messageApi.open({
       type: 'loading',

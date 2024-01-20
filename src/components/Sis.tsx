@@ -3,7 +3,7 @@
 import AddStudent from 'components/AddStudent'
 import React, { useState, useEffect } from 'react'
 import { Form, Input, Popconfirm, Table, Typography } from 'antd'
-import { getCookie } from 'utils'
+import { getCookie, host } from 'utils'
 
 interface Student {
   key: string
@@ -81,7 +81,6 @@ const StudentTable = (props: {
     if (index !== -1) {
       const studentsCopy = [...props.students]
       studentsCopy.splice(index, 1)
-      const host = 'https://awaiters-sis-cform-api.onrender.com/api'
       props.setStudents(studentsCopy)
       setUsingDb(true)
       fetch(`${host}/people`, {
@@ -120,7 +119,6 @@ const StudentTable = (props: {
         })
         props.setStudents(newData)
         setUsingDb(true)
-        const host = 'https://awaiters-sis-cform-api.onrender.com/api'
         fetch(`${host}/people`, {
           method: 'put',
           body: JSON.stringify({
@@ -262,7 +260,6 @@ function Sis() {
   const [loading, setLoading] = useState(false)
   useEffect(() => {
     setLoading(true)
-    const host = 'https://awaiters-sis-cform-api.onrender.com/api'
     fetch(`${host}/people/student`, {
       // @ts-expect-error TS BEING DUMB
       headers: {

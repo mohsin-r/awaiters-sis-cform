@@ -9,6 +9,7 @@ import {
 } from '@ant-design/icons'
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { host } from 'utils'
 
 function Navbar(props: any) {
   const navigate = useNavigate()
@@ -54,7 +55,6 @@ function Navbar(props: any) {
     } else if (e.key === 'cform') {
       navigate(`/${params.section}/cform`)
     } else {
-      const host = 'https://awaiters-sis-cform-api.onrender.com/api'
       const request = new Request(`${host}/logout`, {
         method: 'post',
         headers: {
