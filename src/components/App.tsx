@@ -11,6 +11,7 @@ import Layout from 'components/Layout'
 import Sis from 'components/Sis'
 import Cform from 'components/Cform'
 import CformEditor from 'components/CformEditor'
+import logo from 'assets/logo.png'
 
 import Login from 'components/Login'
 import { getCookie, host } from 'utils'
@@ -36,31 +37,52 @@ function AlreadyLoggedIn(props: { class: string | undefined; children: any }) {
 function App() {
   const [section, setSection] = useState('')
   const [loaded, setLoaded] = useState(false)
+  const [down] = useState(true)
   useEffect(() => {
-    fetch(`${host}/check-session`, {
-      // @ts-expect-error TS BEING DUMB
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-TOKEN': getCookie('csrf_access_token')
-      },
-      credentials: 'include'
-    })
-      .then((res) => {
-        // console.log("The status is", res.status)
-        if (res.status === 200) {
-          return res.json()
-        } else {
-          setSection('')
-          setLoaded(true)
-        }
+    if (!down) {
+      fetch(`${host}/check-session`, {
+        // @ts-expect-error TS BEING DUMB
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': getCookie('csrf_access_token')
+        },
+        credentials: 'include'
       })
-      .then((json) => {
-        if (json) {
-          setSection(json.class)
-          setLoaded(true)
-        }
-      })
+        .then((res) => {
+          // console.log("The status is", res.status)
+          if (res.status === 200) {
+            return res.json()
+          } else {
+            setSection('')
+            setLoaded(true)
+          }
+        })
+        .then((json) => {
+          if (json) {
+            setSection(json.class)
+            setLoaded(true)
+          }
+        })
+    }
   }, [])
+  if (down) {
+    return (
+      <Flex
+        gap="small"
+        className="h-screen w-screen text-[#3b7273]"
+        vertical
+        align="center"
+        justify="center"
+      >
+        <img src={logo} className="h-20"></img>
+        <h1 className="m-0 p-0">SIS and C-Form</h1>
+        <h2 className="m-0 p-0">
+          System is down for implementing improvements.
+        </h2>
+        <h3 className="m-0 p-0">Please check back later.</h3>
+      </Flex>
+    )
+  }
   return (
     <ConfigProvider
       theme={{
