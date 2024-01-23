@@ -3,14 +3,15 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { Button, Table, Space, Typography, Popconfirm } from 'antd'
 import type { TableProps } from 'antd'
 import { useEffect, useState } from 'react'
-import { getCookie, host } from 'utils'
+import { compareString, getCookie, host } from 'utils'
 
 interface DataType {
   key: string
   date: string
 }
 
-function Cform() {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function Cform(props: any) {
   const params = useParams()
   const navigate = useNavigate()
   const [dates, setDates] = useState([] as DataType[])
@@ -21,7 +22,11 @@ function Cform() {
       title: 'Date',
       dataIndex: 'date',
       key: 'date',
-      width: '30%'
+      width: '30%',
+      defaultSortOrder: 'ascend',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      sorter: (a: any, b: any) =>
+        compareString(a.date.toLowerCase(), b.date.toLowerCase())
     },
     {
       title: 'Actions',
@@ -59,6 +64,11 @@ function Cform() {
   ]
 
   useEffect(() => {
+    if (params.section !== localStorage.getItem('section')) {
+      navigate(`/${params.section}/login`)
+      props.setSection('')
+      return
+    }
     setLoading(true)
     fetch(`${host}/dates`, {
       // @ts-expect-error TS BEING DUMB
@@ -91,6 +101,11 @@ function Cform() {
   }, [])
 
   const remove = async (date: string) => {
+    if (params.section !== localStorage.getItem('section')) {
+      navigate(`/${params.section}/login`)
+      props.setSection('')
+      return
+    }
     const index = dates.findIndex((d) => d.date === date)
     if (index !== -1) {
       const datesCopy = [...dates]

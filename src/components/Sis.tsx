@@ -1,15 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import AddStudent from 'components/AddStudent'
 import React, { useState, useEffect } from 'react'
 import { Form, Input, Popconfirm, Table, Typography } from 'antd'
-import { getCookie, host } from 'utils'
+import { compareString, getCookie, host } from 'utils'
+import { useNavigate, useParams } from 'react-router-dom'
 
 interface Student {
   key: string
+  id: string
   name: string
   email: string
   phone: string
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  sorter: Function
+  defaultSortOrder: string
 }
 
 interface EditableCellProps extends React.HTMLAttributes<HTMLElement> {
@@ -26,6 +30,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
   dataIndex,
   title,
   record,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   index,
   children,
   ...restProps
@@ -46,7 +51,34 @@ const EditableCell: React.FC<EditableCellProps> = ({
                     message: `${title} is required.`
                   }
                 ]
-              : []
+              : dataIndex === 'id'
+                ? [
+                    {
+                      required: true,
+                      message: `${title} is required.`
+                    },
+                    {
+                      message: 'Student ID is assigned to another student.',
+                      validator: async (_, value) => {
+                        if (value === record.id || value === '') {
+                          return Promise.resolve()
+                        }
+                        const res = await fetch(`${host}/person/${value}`, {
+                          // @ts-expect-error TS BEING DUMB
+                          headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': getCookie('csrf_access_token')
+                          },
+                          credentials: 'include'
+                        })
+                        if (res.ok) {
+                          return Promise.reject()
+                        }
+                        return Promise.resolve()
+                      }
+                    }
+                  ]
+                : []
           }
         >
           {inputNode}
@@ -62,19 +94,27 @@ const StudentTable = (props: {
   students: Student[]
   setStudents: any
   loading: boolean
+  setSection: any
 }) => {
   const [form] = Form.useForm()
+  const navigate = useNavigate()
+  const params = useParams()
   const [editingName, setEditingName] = useState('')
   const [usingDb, setUsingDb] = useState(false)
 
   const isEditing = (record: Student) => record.key === editingName
 
   const edit = (record: Partial<Student>) => {
-    form.setFieldsValue({ name: '', email: '', phone: '', ...record })
+    form.setFieldsValue({ id: '', name: '', email: '', phone: '', ...record })
     setEditingName(record.key!)
   }
 
-  const remove = (record: Partial<Student>) => {
+  const remove = async (record: Partial<Student>) => {
+    if (params.section !== localStorage.getItem('section')) {
+      navigate(`/${params.section}/login`)
+      props.setSection('')
+      return
+    }
     const index = props.students.findIndex(
       (student) => student.key === record.key
     )
@@ -83,10 +123,10 @@ const StudentTable = (props: {
       studentsCopy.splice(index, 1)
       props.setStudents(studentsCopy)
       setUsingDb(true)
-      fetch(`${host}/people`, {
+      await fetch(`${host}/people`, {
         method: 'delete',
         body: JSON.stringify({
-          name: record.name
+          id: record.id
         }),
         // @ts-expect-error bad TS
         headers: {
@@ -94,9 +134,8 @@ const StudentTable = (props: {
           'X-CSRF-TOKEN': getCookie('csrf_access_token')
         },
         credentials: 'include'
-      }).then((res) => {
-        setUsingDb(false)
       })
+      setUsingDb(false)
     }
   }
 
@@ -104,26 +143,32 @@ const StudentTable = (props: {
     setEditingName('')
   }
 
-  const save = async (name: React.Key) => {
+  const save = async (id: React.Key) => {
+    if (params.section !== localStorage.getItem('section')) {
+      navigate(`/${params.section}/login`)
+      props.setSection('')
+      return
+    }
     try {
       const row = (await form.validateFields()) as Student
 
       const newData: Student[] = [...props.students]
-      const index = newData.findIndex((item) => name === item.key)
+      const index = newData.findIndex((item) => id === item.key)
       if (index > -1) {
         const item = newData[index]
-        row.key = row.name
+        row.key = row.id
         newData.splice(index, 1, {
           ...item,
           ...row
         })
         props.setStudents(newData)
         setUsingDb(true)
-        fetch(`${host}/people`, {
+        await fetch(`${host}/people`, {
           method: 'put',
           body: JSON.stringify({
-            name: name,
+            id: id,
             newPerson: {
+              id: row.id,
               name: row.name,
               email: row.email,
               phone: row.phone,
@@ -137,15 +182,7 @@ const StudentTable = (props: {
           },
           credentials: 'include'
         })
-          .then((res) => {
-            if (res.status === 200) {
-              setUsingDb(false)
-            }
-          })
-          .catch((error) => {
-            console.log(error)
-            setUsingDb(false)
-          })
+        setUsingDb(false)
         setEditingName('')
       }
     } catch (errInfo) {
@@ -155,21 +192,31 @@ const StudentTable = (props: {
 
   const columns = [
     {
+      title: 'Student ID',
+      dataIndex: 'id',
+      width: '20%',
+      editable: true,
+      defaultSortOrder: 'ascend',
+      sorter: (a: any, b: any) =>
+        compareString(a.id.toLowerCase(), b.id.toLowerCase())
+    },
+    {
       title: 'Full Name',
       dataIndex: 'name',
-      width: '25%',
-      editable: true
+      width: '20%',
+      editable: true,
+      sorter: (a: any, b: any) => a.name.toLowerCase() - b.name.toLowerCase()
     },
     {
       title: 'Email Address',
       dataIndex: 'email',
-      width: '25%',
+      width: '20%',
       editable: true
     },
     {
       title: 'Phone Number',
       dataIndex: 'phone',
-      width: '25%',
+      width: '20%',
       editable: true
     },
     {
@@ -244,7 +291,7 @@ const StudentTable = (props: {
         }}
         bordered
         dataSource={props.students}
-        columns={mergedColumns}
+        columns={mergedColumns as any}
         rowClassName="editable-row"
         pagination={{
           defaultPageSize: 100,
@@ -255,12 +302,20 @@ const StudentTable = (props: {
   )
 }
 
-function Sis() {
+function Sis(props: any) {
   const [students, setStudents] = useState([])
   const [loading, setLoading] = useState(false)
-  useEffect(() => {
+  const params = useParams()
+  const navigate = useNavigate()
+
+  const loadStudents = async () => {
+    if (params.section !== localStorage.getItem('section')) {
+      navigate(`/${params.section}/login`)
+      props.setSection('')
+      return
+    }
     setLoading(true)
-    fetch(`${host}/people/student`, {
+    const res = await fetch(`${host}/people/student`, {
       // @ts-expect-error TS BEING DUMB
       headers: {
         'Content-Type': 'application/json',
@@ -268,35 +323,30 @@ function Sis() {
       },
       credentials: 'include'
     })
-      .then((res) => {
-        if (res.status === 200) {
-          return res.json()
-        }
-        throw new Error()
+    const json = await res.json()
+    setStudents(
+      json.map((student: { key: any; id: any }) => {
+        student.key = student.id
+        return student
       })
-      .then((json) => {
-        if (json) {
-          setStudents(
-            json.map((student: { key: any; name: any }) => {
-              student.key = student.name
-              return student
-            })
-          )
-          setLoading(false)
-        }
-      })
-      .catch((error) => {
-        console.log(error)
-        setLoading(false)
-      })
+    )
+    setLoading(false)
+  }
+  useEffect(() => {
+    loadStudents()
   }, [])
   return (
     <div className="mx-4 mt-4">
       <div className="flex items-center">
         <h2 className="m-0">Students</h2>
-        <AddStudent students={students} setStudents={setStudents} />
+        <AddStudent
+          students={students}
+          setStudents={setStudents}
+          setSection={props.setSection}
+        />
       </div>
       <StudentTable
+        setSection={props.setSection}
         loading={loading}
         students={students}
         setStudents={setStudents}

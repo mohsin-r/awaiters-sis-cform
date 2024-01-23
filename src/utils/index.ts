@@ -11,4 +11,14 @@ export function getCookie(name: string) {
   }
 }
 
-export const host = 'https://awaiters-sis-cform-api.onrender.com/api'
+export function compareString(a: string, b: string) {
+  if (a < b) {
+    return -1
+  } else if (a > b) {
+    return 1
+  } else {
+    return 0
+  }
+}
+
+export const host = 'https://awaiters-sis-cform-api.onrender.com'

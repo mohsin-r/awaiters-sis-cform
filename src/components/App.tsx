@@ -19,7 +19,10 @@ import { getCookie, host } from 'utils'
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function RequireAuth(props: { class: string | undefined; children: any }) {
   const params = useParams()
-  if (props.class !== params.section) {
+  if (
+    props.class !== params.section ||
+    props.class !== localStorage.getItem('section')
+  ) {
     return <Navigate to={`/${params.section}/login`} />
   }
   return props.children
@@ -28,7 +31,10 @@ function RequireAuth(props: { class: string | undefined; children: any }) {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function AlreadyLoggedIn(props: { class: string | undefined; children: any }) {
   const params = useParams()
-  if (props.class === params.section) {
+  if (
+    props.class === params.section &&
+    props.class === localStorage.getItem('section')
+  ) {
     return <Navigate to={`/${params.section}/cform`} />
   }
   return props.children
@@ -37,7 +43,8 @@ function AlreadyLoggedIn(props: { class: string | undefined; children: any }) {
 function App() {
   const [section, setSection] = useState('')
   const [loaded, setLoaded] = useState(false)
-  const [down] = useState(true)
+  const [down] = useState(false)
+  const [started, setStarted] = useState(false)
   useEffect(() => {
     if (!down) {
       fetch(`${host}/check-session`, {
@@ -59,6 +66,7 @@ function App() {
         })
         .then((json) => {
           if (json) {
+            localStorage.setItem('section', json.class)
             setSection(json.class)
             setLoaded(true)
           }
@@ -131,7 +139,11 @@ function App() {
               path="/:section/login"
               element={
                 <AlreadyLoggedIn class={section}>
-                  <Login setSection={setSection} />
+                  <Login
+                    setSection={setSection}
+                    started={started}
+                    setStarted={setStarted}
+                  />
                 </AlreadyLoggedIn>
               }
             />
@@ -143,16 +155,19 @@ function App() {
                 </RequireAuth>
               }
             >
-              <Route path="sis" element={<Sis />} />
-              <Route path="cform" element={<Cform />} />
-              <Route path="cform/new" element={<CformEditor mode="new" />} />
+              <Route path="sis" element={<Sis setSection={setSection} />} />
+              <Route path="cform" element={<Cform setSection={setSection} />} />
+              <Route
+                path="cform/new"
+                element={<CformEditor setSection={setSection} mode="new" />}
+              />
               <Route
                 path="cform/view/:date"
-                element={<CformEditor mode="view" />}
+                element={<CformEditor setSection={setSection} mode="view" />}
               />
               <Route
                 path="cform/edit/:date"
-                element={<CformEditor mode="edit" />}
+                element={<CformEditor setSection={setSection} mode="edit" />}
               />
             </Route>
           </Routes>

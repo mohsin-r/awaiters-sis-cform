@@ -22,6 +22,7 @@ import dayjs from 'dayjs'
 interface Student {
   key: string
   name: string
+  present: boolean
   late: number
   ayahs: number
   quranHomework: boolean
@@ -30,7 +31,7 @@ interface Student {
   akhlaqHomework: boolean
 }
 
-export default function CformEditor(props: { mode: string }) {
+export default function CformEditor(props: any) {
   const [form] = Form.useForm()
   const [students, setStudents] = useState([] as Student[])
   const [date, setDate] = useState('' as any)
@@ -48,6 +49,11 @@ export default function CformEditor(props: { mode: string }) {
   const params = useParams()
 
   const addCoverage = async (values: any) => {
+    if (params.section !== localStorage.getItem('section')) {
+      navigate(`/${params.section}/login`)
+      props.setSection('')
+      return
+    }
     const res = await fetch(`${host}/coverage`, {
       method: 'post',
       body: JSON.stringify({
@@ -70,6 +76,11 @@ export default function CformEditor(props: { mode: string }) {
   }
 
   const updateCoverage = async (date: string, values: any) => {
+    if (params.section !== localStorage.getItem('section')) {
+      navigate(`/${params.section}/login`)
+      props.setSection('')
+      return
+    }
     const res = await fetch(`${host}/coverage`, {
       method: 'put',
       body: JSON.stringify({
@@ -95,6 +106,11 @@ export default function CformEditor(props: { mode: string }) {
   }
 
   const getExisting = async () => {
+    if (params.section !== localStorage.getItem('section')) {
+      navigate(`/${params.section}/login`)
+      props.setSection('')
+      return
+    }
     const coverage = await fetch(`${host}/coverage/${params.date}`, {
       // @ts-expect-error bad TS
       headers: {
@@ -143,6 +159,11 @@ export default function CformEditor(props: { mode: string }) {
   }
 
   async function getStudents() {
+    if (params.section !== localStorage.getItem('section')) {
+      navigate(`/${params.section}/login`)
+      props.setSection('')
+      return
+    }
     const res = await fetch(`${host}/people/student`, {
       // @ts-expect-error TS BEING DUMB
       headers: {
@@ -159,6 +180,7 @@ export default function CformEditor(props: { mode: string }) {
         delete student.phone
         student.ayahs = 0
         student.late = 0
+        student.present = true
         student.quranHomework = true
         student.ideologyHomework = true
         student.historyHomework = true
@@ -166,12 +188,47 @@ export default function CformEditor(props: { mode: string }) {
         return student
       })
     )
+  }
+
+  async function getLast() {
+    if (params.section !== localStorage.getItem('section')) {
+      navigate(`/${params.section}/login`)
+      props.setSection('')
+      return
+    }
+    const coverage = await fetch(`${host}/coverage/last`, {
+      // @ts-expect-error bad TS
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': getCookie('csrf_access_token')
+      },
+      credentials: 'include'
+    })
+    if (coverage.ok) {
+      const json = await coverage.json()
+      if (json.start) {
+        setStart(dayjs(json.start, 'h:mmA'))
+      }
+      if (json.end) {
+        setEnd(dayjs(json.end, 'h:mmA'))
+      }
+      setQuranArabic(json.quranArabic)
+      setIdeology(json.ideology)
+      setHistory(json.history)
+      setAkhlaq(json.akhlaq)
+    }
+    setDate(dayjs(dayjs(), 'YYYY-MM-DD'))
     setTimeout(() => {
       setLoaded(true)
     }, 500)
   }
 
   const addProgress = async (values: any) => {
+    if (params.section !== localStorage.getItem('section')) {
+      navigate(`/${params.section}/login`)
+      props.setSection('')
+      return
+    }
     const res = await fetch(`${host}/progress`, {
       method: 'post',
       body: JSON.stringify({
@@ -189,6 +246,11 @@ export default function CformEditor(props: { mode: string }) {
   }
 
   const updateProgress = async (date: string, values: any) => {
+    if (params.section !== localStorage.getItem('section')) {
+      navigate(`/${params.section}/login`)
+      props.setSection('')
+      return
+    }
     const res = await fetch(`${host}/progress`, {
       method: 'put',
       body: JSON.stringify({
@@ -273,6 +335,7 @@ export default function CformEditor(props: { mode: string }) {
   useEffect(() => {
     if (props.mode === 'new') {
       getStudents()
+      getLast()
     } else {
       getExisting()
     }
@@ -397,10 +460,23 @@ export default function CformEditor(props: { mode: string }) {
                     title={students[index].name}
                     key={field.key}
                   >
-                    <Form.Item label="Minutes Late" name={[field.name, 'late']}>
+                    <Form.Item
+                      label="Present"
+                      name={[field.name, 'present']}
+                      valuePropName="checked"
+                      className="mb-0"
+                    >
+                      <Checkbox />
+                    </Form.Item>
+                    <Form.Item
+                      label="Minutes Late"
+                      name={[field.name, 'late']}
+                      className="mb-2"
+                    >
                       <InputNumber />
                     </Form.Item>
                     <Form.Item
+                      className="mb-0"
                       label="Ayaat Recited"
                       name={[field.name, 'ayahs']}
                     >

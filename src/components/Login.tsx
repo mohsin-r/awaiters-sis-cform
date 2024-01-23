@@ -2,7 +2,7 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { Button, Form, Input, message } from 'antd'
 import logo from 'assets/logo.png'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { host } from 'utils'
 
 function Login(props: any) {
@@ -38,11 +38,13 @@ function Login(props: any) {
       })
       .then(() => {
         props.setSection(section)
+        localStorage.setItem('section', section!)
         messageApi.destroy()
         messageApi.success('Login was successful. Redirecting...')
         setTimeout(() => {
           setLoading(false)
           navigate(`/${section}/cform`)
+          props.setStarted(true)
         }, 2000)
       })
       .catch(() => {
@@ -62,6 +64,12 @@ function Login(props: any) {
     class?: string
     password?: string
   }
+
+  useEffect(() => {
+    if (props.started) {
+      messageApi.error('Session Expired. Please login again.')
+    }
+  }, [])
 
   return (
     <div className="flex h-screen flex-col items-center justify-center rounded-lg text-[#3b7273]">
