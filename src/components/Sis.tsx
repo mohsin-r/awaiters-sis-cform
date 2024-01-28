@@ -294,7 +294,7 @@ const StudentTable = (props: {
         columns={mergedColumns as any}
         rowClassName="editable-row"
         pagination={{
-          defaultPageSize: 100,
+          defaultPageSize: 10,
           hideOnSinglePage: true
         }}
       />

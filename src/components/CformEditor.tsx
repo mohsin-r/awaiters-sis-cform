@@ -18,6 +18,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { getCookie, host } from 'utils'
 import dayjs from 'dayjs'
+import { CloseOutlined } from '@ant-design/icons'
 
 interface Student {
   key: string
@@ -224,6 +225,7 @@ export default function CformEditor(props: any) {
   }
 
   const addProgress = async (values: any) => {
+    console.log(values)
     if (params.section !== localStorage.getItem('section')) {
       navigate(`/${params.section}/login`)
       props.setSection('')
@@ -452,13 +454,20 @@ export default function CformEditor(props: any) {
             </Form.Item>
           </Space>
           <Form.List name="students">
-            {(fields) => (
+            {(fields, { remove }) => (
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                 {fields.map((field, index) => (
                   <Card
                     size="small"
                     title={students[index].name}
                     key={field.key}
+                    extra={
+                      <CloseOutlined
+                        onClick={() => {
+                          remove(field.name)
+                        }}
+                      />
+                    }
                   >
                     <Form.Item
                       label="Present"

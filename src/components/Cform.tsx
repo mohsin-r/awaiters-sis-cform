@@ -161,7 +161,7 @@ function Cform(props: any) {
         columns={columns}
         dataSource={dates}
         loading={loading}
-        pagination={{ hideOnSinglePage: true, defaultPageSize: 100 }}
+        pagination={{ hideOnSinglePage: true, defaultPageSize: 10 }}
       />
     </div>
   )
