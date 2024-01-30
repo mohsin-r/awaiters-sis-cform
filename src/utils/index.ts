@@ -21,4 +21,4 @@ export function compareString(a: string, b: string) {
   }
 }
 
-export const host = 'http://localhost:5000/api'
+export const host = 'https://awaiters-sis-cform-awaiters.koyeb.app/api'

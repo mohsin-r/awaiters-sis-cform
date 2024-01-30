@@ -43,7 +43,7 @@ function AlreadyLoggedIn(props: { class: string | undefined; children: any }) {
 function App() {
   const [section, setSection] = useState('')
   const [loaded, setLoaded] = useState(false)
-  const [down] = useState(true)
+  const [down] = useState(false)
   const [started, setStarted] = useState(false)
   useEffect(() => {
     if (!down) {

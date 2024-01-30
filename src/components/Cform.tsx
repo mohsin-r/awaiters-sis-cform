@@ -23,7 +23,7 @@ function Cform(props: any) {
       dataIndex: 'date',
       key: 'date',
       width: '30%',
-      defaultSortOrder: 'ascend',
+      defaultSortOrder: 'descend',
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       sorter: (a: any, b: any) =>
         compareString(a.date.toLowerCase(), b.date.toLowerCase())
