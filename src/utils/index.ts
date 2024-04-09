@@ -21,4 +21,4 @@ export function compareString(a: string, b: string) {
   }
 }
 
-export const host = process.env.API_HOST
+export const host = import.meta.env.VITE_API_HOST
