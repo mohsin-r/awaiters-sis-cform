@@ -21,5 +21,4 @@ export function compareString(a: string, b: string) {
   }
 }
 
-export const host =
-  process.env.API_HOST || 'https://awaiters-sis-cform-awaiters.koyeb.app/api'
+export const host = process.env.API_HOST
