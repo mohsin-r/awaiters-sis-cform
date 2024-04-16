@@ -15,6 +15,9 @@ import logo from 'assets/logo.png'
 
 import Login from 'components/Login'
 import { getCookie, host } from 'utils'
+import Teachers from 'components/Teachers'
+import Grades from 'components/Grades'
+import Reports from 'components/Reports'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function RequireAuth(props: { class: string | undefined; children: any }) {
@@ -43,10 +46,9 @@ function AlreadyLoggedIn(props: { class: string | undefined; children: any }) {
 function App() {
   const [section, setSection] = useState('')
   const [loaded, setLoaded] = useState(false)
-  const [down] = useState(false)
   const [started, setStarted] = useState(false)
   useEffect(() => {
-    if (!down) {
+    if (import.meta.env.VITE_DOWN === 'false') {
       fetch(`${host}/check-session`, {
         // @ts-expect-error TS BEING DUMB
         headers: {
@@ -73,7 +75,7 @@ function App() {
         })
     }
   }, [])
-  if (down) {
+  if (import.meta.env.VITE_DOWN === 'true') {
     return (
       <Flex
         gap="small"
@@ -156,6 +158,7 @@ function App() {
               }
             >
               <Route path="sis" element={<Sis setSection={setSection} />} />
+              <Route path="teachers" element={<Teachers />} />
               <Route path="cform" element={<Cform setSection={setSection} />} />
               <Route
                 path="cform/new"
@@ -169,6 +172,8 @@ function App() {
                 path="cform/edit/:date"
                 element={<CformEditor setSection={setSection} mode="edit" />}
               />
+              <Route path="grades" element={<Grades />} />
+              <Route path="reports" element={<Reports />} />
             </Route>
           </Routes>
         </BrowserRouter>

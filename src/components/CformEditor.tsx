@@ -12,6 +12,7 @@ import {
   Card,
   Spin,
   Flex,
+  Typography,
   message
 } from 'antd'
 import { useEffect, useState } from 'react'
@@ -21,6 +22,7 @@ import dayjs from 'dayjs'
 
 interface Student {
   key: string
+  id: string
   name: string
   present: boolean
   late: number
@@ -29,11 +31,24 @@ interface Student {
   ideologyHomework: boolean
   historyHomework: boolean
   akhlaqHomework: boolean
+  visible: boolean
+  new?: boolean
+}
+
+interface Teacher {
+  key: string
+  id: string
+  name: string
+  present: boolean
+  late: number
+  visible: boolean
+  new?: boolean
 }
 
 export default function CformEditor(props: any) {
   const [form] = Form.useForm()
   const [students, setStudents] = useState([] as Student[])
+  const [teachers, setTeachers] = useState([] as Teacher[])
   const [date, setDate] = useState('' as any)
   const [start, setStart] = useState('' as any)
   const [end, setEnd] = useState('' as any)
@@ -143,12 +158,34 @@ export default function CformEditor(props: any) {
     })
     if (progress.ok) {
       const json = await progress.json()
-      setStudents(
-        json.map((student: Student) => {
-          student.key = student.name
-          return student
-        })
+      const entryStudents = json.students.map((student: Student) => {
+        student.key = student.name
+        student.visible = true
+        return student
+      })
+      const existingStudentIds = json.students.map(
+        (student: Student) => student.id
       )
+      if (props.mode === 'edit') {
+        const remainingStudents = await getPeople('student', existingStudentIds)
+        setStudents([...entryStudents, ...remainingStudents])
+      } else {
+        setStudents(entryStudents)
+      }
+      const entryTeachers = json.teachers.map((teacher: Teacher) => {
+        teacher.key = teacher.name
+        teacher.visible = true
+        return teacher
+      })
+      const existingTeacherIds = json.teachers.map(
+        (teacher: Teacher) => teacher.id
+      )
+      if (props.mode === 'edit') {
+        const remainingTeachers = await getPeople('teacher', existingTeacherIds)
+        setTeachers([...entryTeachers, ...remainingTeachers])
+      } else {
+        setTeachers(entryTeachers)
+      }
     }
     setTimeout(() => {
       setLoaded(true)
@@ -158,13 +195,13 @@ export default function CformEditor(props: any) {
     }
   }
 
-  async function getStudents() {
+  async function getPeople(type: string, existingIds?: string[]) {
     if (params.section !== localStorage.getItem('section')) {
       navigate(`/${params.section}/login`)
       props.setSection('')
       return
     }
-    const res = await fetch(`${host}/people/student`, {
+    const res = await fetch(`${host}/people/${type}`, {
       // @ts-expect-error TS BEING DUMB
       headers: {
         'Content-Type': 'application/json',
@@ -173,21 +210,39 @@ export default function CformEditor(props: any) {
       credentials: 'include'
     })
     const json = await res.json()
-    setStudents(
-      json.map((student: any) => {
-        student.key = student.name
-        delete student.email
-        delete student.phone
+    const mappedPeople = json.map((student: any) => {
+      student.key = student.name
+      delete student.email
+      delete student.phone
+      student.late = 0
+      student.present = true
+      if (type === 'student') {
         student.ayahs = 0
-        student.late = 0
-        student.present = true
         student.quranHomework = true
         student.ideologyHomework = true
         student.historyHomework = true
         student.akhlaqHomework = true
-        return student
+      }
+      student.visible = true
+      return student
+    })
+    if (props.mode === 'new') {
+      if (type === 'student') {
+        setStudents(mappedPeople)
+      } else {
+        setTeachers(mappedPeople)
+      }
+      return mappedPeople
+    } else {
+      const remainingPeople: any[] = []
+      mappedPeople.forEach((mp: any) => {
+        if (!existingIds?.includes(mp.id)) {
+          mp.visible = false
+          remainingPeople.push(mp)
+        }
       })
-    )
+      return remainingPeople
+    }
   }
 
   async function getLast() {
@@ -224,17 +279,17 @@ export default function CformEditor(props: any) {
   }
 
   const addProgress = async (values: any) => {
-    console.log(values)
     if (params.section !== localStorage.getItem('section')) {
       navigate(`/${params.section}/login`)
       props.setSection('')
-      return
+      return false
     }
     const res = await fetch(`${host}/progress`, {
       method: 'post',
       body: JSON.stringify({
         date: values.date,
-        students: values.students
+        students: values.students,
+        teachers: values.teachers
       }),
       // @ts-expect-error bad TS
       headers: {
@@ -252,13 +307,45 @@ export default function CformEditor(props: any) {
       props.setSection('')
       return
     }
+    const updateStudents = values.students.filter((s: Student, idx: number) => {
+      if (students[idx].visible && !students[idx].new) {
+        return true
+      }
+      return false
+    })
+    const newStudents = values.students.filter((s: Student, idx: number) => {
+      if (students[idx].visible && students[idx].new) {
+        return true
+      }
+      return false
+    })
+    const updateTeachers = values.teachers.filter((t: Teacher, idx: number) => {
+      if (teachers[idx].visible && !teachers[idx].new) {
+        return true
+      }
+      return false
+    })
+    const newTeachers = values.teachers.filter((t: Teacher, idx: number) => {
+      if (teachers[idx].visible && teachers[idx].new) {
+        return true
+      }
+      return false
+    })
     const res = await fetch(`${host}/progress`, {
       method: 'put',
       body: JSON.stringify({
         date: date,
-        students: values.students.map((student: any) => {
-          const obj: any = { name: student.name }
+        students: updateStudents.map((student: any) => {
+          const obj: any = { name: student.name, id: student.id }
           const newProgress = student
+          newProgress.date = values.date
+          delete newProgress.name
+          obj.newProgress = newProgress
+          return obj
+        }),
+        teachers: updateTeachers.map((teacher: any) => {
+          const obj: any = { name: teacher.name, id: teacher.id }
+          const newProgress = teacher
           newProgress.date = values.date
           delete newProgress.name
           obj.newProgress = newProgress
@@ -272,7 +359,13 @@ export default function CformEditor(props: any) {
       },
       credentials: 'include'
     })
-    return res.status === 200
+    const json = await res.json()
+    const addStatus = await addProgress({
+      students: newStudents,
+      teachers: newTeachers,
+      date: date
+    })
+    return res.status === 200 && addStatus
   }
 
   const handleSubmit = async (values: any) => {
@@ -292,9 +385,7 @@ export default function CformEditor(props: any) {
     if (props.mode === 'new') {
       const coverageAdded = await addCoverage(values)
       const progressAdded =
-        values.students && values.students.length > 0
-          ? await addProgress(values)
-          : true
+        values.students && values.teachers ? await addProgress(values) : true
       messageApi.destroy()
       if (coverageAdded && progressAdded) {
         messageApi.success('Successfully added record. Redirecting...')
@@ -314,7 +405,7 @@ export default function CformEditor(props: any) {
         values
       )
       const progressUpdated =
-        values.students && values.students.length > 0
+        values.students && values.teachers
           ? await updateProgress(date.format('YYYY-MM-DD'), values)
           : true
       messageApi.destroy()
@@ -326,16 +417,28 @@ export default function CformEditor(props: any) {
         }, 1500)
       } else {
         messageApi.error(
-          'Failed to update record. A record for the new date you have selected already exists.'
+          'Failed to update record. Possibly a record for the new date you have selected already exists, or there was another error.'
         )
         setSubmitting(false)
       }
     }
   }
 
+  const addToEntry = (type: string, index: number) => {
+    const copy: any = type === 'student' ? [...students] : [...teachers]
+    copy[index].visible = true
+    copy[index].new = true
+    if (type === 'student') {
+      setStudents(copy)
+    } else {
+      setTeachers(copy)
+    }
+  }
+
   useEffect(() => {
     if (props.mode === 'new') {
-      getStudents()
+      getPeople('student')
+      getPeople('teacher')
       getLast()
     } else {
       getExisting()
@@ -389,7 +492,8 @@ export default function CformEditor(props: any) {
             ideology: ideology,
             history: history,
             akhlaq: akhlaq,
-            students: students
+            students: students,
+            teachers: teachers
           }}
           onFinish={handleSubmit}
         >
@@ -452,6 +556,54 @@ export default function CformEditor(props: any) {
               <Input.TextArea />
             </Form.Item>
           </Space>
+          <h3>Teachers</h3>
+          <Form.List name="teachers">
+            {(fields) => (
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                {fields.map((field, index) => (
+                  <Card
+                    size="small"
+                    title={teachers[index].name}
+                    className="relative"
+                    key={field.key}
+                  >
+                    {!teachers[index].visible && props.mode === 'edit' && (
+                      <div className="absolute left-0 top-0 flex h-full w-full flex-col items-center justify-center">
+                        <Button
+                          onClick={() => {
+                            addToEntry('teacher', index)
+                          }}
+                          type="primary"
+                        >
+                          Add to entry
+                        </Button>
+                      </div>
+                    )}
+                    <Form.Item
+                      label="Present"
+                      name={[field.name, 'present']}
+                      valuePropName="checked"
+                      className={`mb-0 ${
+                        teachers[index].visible ? '' : 'invisible'
+                      }`}
+                    >
+                      <Checkbox />
+                    </Form.Item>
+                    <Form.Item
+                      label="Minutes Late"
+                      name={[field.name, 'late']}
+                      className={`mb-2 ${
+                        teachers[index].visible ? '' : 'invisible'
+                      }`}
+                    >
+                      <InputNumber />
+                    </Form.Item>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </Form.List>
+          <h3>Students</h3>
           <Form.List name="students">
             {(fields) => (
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -459,25 +611,44 @@ export default function CformEditor(props: any) {
                   <Card
                     size="small"
                     title={students[index].name}
+                    className="relative"
                     key={field.key}
                   >
+                    {!students[index].visible && props.mode === 'edit' && (
+                      <div className="absolute left-0 top-0 flex h-full w-full flex-col items-center justify-center">
+                        <Button
+                          onClick={() => {
+                            addToEntry('student', index)
+                          }}
+                          type="primary"
+                        >
+                          Add to entry
+                        </Button>
+                      </div>
+                    )}
                     <Form.Item
                       label="Present"
                       name={[field.name, 'present']}
                       valuePropName="checked"
-                      className="mb-0"
+                      className={`mb-0 ${
+                        students[index].visible ? '' : 'invisible'
+                      }`}
                     >
                       <Checkbox />
                     </Form.Item>
                     <Form.Item
                       label="Minutes Late"
                       name={[field.name, 'late']}
-                      className="mb-2"
+                      className={`mb-2 ${
+                        students[index].visible ? '' : 'invisible'
+                      }`}
                     >
                       <InputNumber />
                     </Form.Item>
                     <Form.Item
-                      className="mb-0"
+                      className={`mb-0 ${
+                        students[index].visible ? '' : 'invisible'
+                      }`}
                       label="Ayaat Recited"
                       name={[field.name, 'ayahs']}
                     >
@@ -487,7 +658,9 @@ export default function CformEditor(props: any) {
                       label="Quran/Arabic H/W Complete"
                       name={[field.name, 'quranHomework']}
                       valuePropName="checked"
-                      className="mb-0"
+                      className={`mb-0 ${
+                        students[index].visible ? '' : 'invisible'
+                      }`}
                     >
                       <Checkbox />
                     </Form.Item>
@@ -495,7 +668,9 @@ export default function CformEditor(props: any) {
                       label="Ideology H/W Complete"
                       name={[field.name, 'ideologyHomework']}
                       valuePropName="checked"
-                      className="mb-0"
+                      className={`mb-0 ${
+                        students[index].visible ? '' : 'invisible'
+                      }`}
                     >
                       <Checkbox />
                     </Form.Item>
@@ -503,7 +678,9 @@ export default function CformEditor(props: any) {
                       label="History H/W Complete"
                       name={[field.name, 'historyHomework']}
                       valuePropName="checked"
-                      className="mb-0"
+                      className={`mb-0 ${
+                        students[index].visible ? '' : 'invisible'
+                      }`}
                     >
                       <Checkbox />
                     </Form.Item>
@@ -511,7 +688,9 @@ export default function CformEditor(props: any) {
                       label="Akhlaq H/W Complete"
                       name={[field.name, 'akhlaqHomework']}
                       valuePropName="checked"
-                      className="mb-0"
+                      className={`mb-0 ${
+                        students[index].visible ? '' : 'invisible'
+                      }`}
                     >
                       <Checkbox />
                     </Form.Item>

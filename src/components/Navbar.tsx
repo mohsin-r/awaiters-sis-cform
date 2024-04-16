@@ -5,7 +5,10 @@ import { useLocation } from 'react-router-dom'
 import {
   FormOutlined,
   LogoutOutlined,
-  DatabaseOutlined
+  DatabaseOutlined,
+  ExceptionOutlined,
+  CheckSquareOutlined,
+  UserOutlined
 } from '@ant-design/icons'
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -29,9 +32,24 @@ function Navbar(props: any) {
       icon: <DatabaseOutlined />
     },
     {
-      label: 'CForm',
+      label: 'Teachers',
+      key: 'teachers',
+      icon: <UserOutlined />
+    },
+    {
+      label: 'C-Form',
       key: 'cform',
       icon: <FormOutlined />
+    },
+    {
+      label: 'Grades',
+      key: 'grades',
+      icon: <CheckSquareOutlined />
+    },
+    {
+      label: 'Reports',
+      key: 'reports',
+      icon: <ExceptionOutlined />
     },
     {
       label: 'Logout',
@@ -43,8 +61,14 @@ function Navbar(props: any) {
   const [current, setCurrent] = useState(() => {
     if (location.pathname.includes('sis')) {
       return 'sis'
-    } else {
+    } else if (location.pathname.includes('teachers')) {
+      return 'teachers'
+    } else if (location.pathname.includes('cform')) {
       return 'cform'
+    } else if (location.pathname.includes('grades')) {
+      return 'grades'
+    } else {
+      return 'reports'
     }
   })
 
@@ -52,8 +76,14 @@ function Navbar(props: any) {
     setCurrent(e.key)
     if (e.key === 'sis') {
       navigate(`/${params.section}/sis`)
+    } else if (e.key === 'teachers') {
+      navigate(`/${params.section}/teachers`)
     } else if (e.key === 'cform') {
       navigate(`/${params.section}/cform`)
+    } else if (e.key === 'grades') {
+      navigate(`/${params.section}/grades`)
+    } else if (e.key === 'reports') {
+      navigate(`/${params.section}/reports`)
     } else {
       const request = new Request(`${host}/logout`, {
         method: 'post',
