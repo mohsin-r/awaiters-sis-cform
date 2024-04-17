@@ -435,14 +435,18 @@ export default function CformEditor(props: any) {
     }
   }
 
-  useEffect(() => {
+  const initialize = async () => {
     if (props.mode === 'new') {
-      getPeople('student')
-      getPeople('teacher')
-      getLast()
+      await getPeople('student')
+      await getPeople('teacher')
+      await getLast()
     } else {
-      getExisting()
+      await getExisting()
     }
+  }
+
+  useEffect(() => {
+    initialize()
   }, [])
   if (!loaded) {
     return (
