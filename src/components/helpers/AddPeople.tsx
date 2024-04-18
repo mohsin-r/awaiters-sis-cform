@@ -69,7 +69,7 @@ export default function AddPerson(props: {
       props.setSection('')
       return
     }
-    if (existing) {
+    if (existing && props.type === 'teacher') {
       const idx = Number(values.selection)
       values = existingOptions[idx]
       values.existing = true
