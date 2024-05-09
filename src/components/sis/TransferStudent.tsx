@@ -2,7 +2,7 @@
 import { Button, Modal, Form, Input, message, Typography, Select } from 'antd'
 import { useState } from 'react'
 import { getCookie, host } from 'utils'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 
 export default function TransferStudent(props: {
   id: string
@@ -10,15 +10,13 @@ export default function TransferStudent(props: {
   disabled: boolean
   setSection: any
   remove: any
+  classes: Array<any>
 }) {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [form] = Form.useForm()
   const [messageApi, contextHolder] = message.useMessage()
   const params = useParams()
-  const opts = ['aw1', 'aw2', 'aw3', 'aw4', 'aw5', 'aw6', 'aw8', 'aw9']
-  opts.splice(opts.indexOf(params.section!), 1)
-  const navigate = useNavigate()
 
   const openModal = () => {
     setOpen(true)
@@ -26,18 +24,13 @@ export default function TransferStudent(props: {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleSubmit = async (values: any) => {
-    if (params.section !== localStorage.getItem('section')) {
-      navigate(`/${params.section}/login`)
-      props.setSection('')
-      return
-    }
     setLoading(true)
-    await fetch(`${host}/people`, {
+    await fetch(`${host}/${params.section}/people`, {
       method: 'put',
       body: JSON.stringify({
         transfer: true,
         id: props.id,
-        class: values.new
+        newClass: values.new
       }),
       // @ts-expect-error bad TS
       headers: {
@@ -96,7 +89,7 @@ export default function TransferStudent(props: {
           layout="vertical"
           onFinish={handleSubmit}
           autoComplete="off"
-          initialValues={{ current: params.section }}
+          initialValues={{ current: params.section?.toUpperCase() }}
         >
           <Form.Item<FieldType> label="Current Class" name="current">
             <Input disabled />
@@ -104,9 +97,9 @@ export default function TransferStudent(props: {
 
           <Form.Item<FieldType> label="New Class" name="new">
             <Select
-              options={opts.map((opt) => {
-                return { value: opt, label: opt }
-              })}
+              options={props.classes.filter(
+                (cl) => cl.value !== params.section
+              )}
               size="large"
             />
           </Form.Item>

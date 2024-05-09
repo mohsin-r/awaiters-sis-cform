@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export function classNames(...classes: unknown[]): string {
   return classes.filter(Boolean).join(' ')
 }
@@ -19,6 +20,10 @@ export function compareString(a: string, b: string) {
   } else {
     return 0
   }
+}
+
+export function compareRecords(a: any, b: any, field: string) {
+  return a[field] - b[field]
 }
 
 export const host = import.meta.env.VITE_API_HOST

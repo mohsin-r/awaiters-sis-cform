@@ -64,12 +64,7 @@ export default function CformEditor(props: any) {
   const params = useParams()
 
   const addCoverage = async (values: any) => {
-    if (params.section !== localStorage.getItem('section')) {
-      navigate(`/${params.section}/login`)
-      props.setSection('')
-      return
-    }
-    const res = await fetch(`${host}/coverage`, {
+    const res = await fetch(`${host}/${params.section}/coverage`, {
       method: 'post',
       body: JSON.stringify({
         date: values.date,
@@ -91,12 +86,7 @@ export default function CformEditor(props: any) {
   }
 
   const updateCoverage = async (date: string, values: any) => {
-    if (params.section !== localStorage.getItem('section')) {
-      navigate(`/${params.section}/login`)
-      props.setSection('')
-      return
-    }
-    const res = await fetch(`${host}/coverage`, {
+    const res = await fetch(`${host}/${params.section}/coverage`, {
       method: 'put',
       body: JSON.stringify({
         date: date,
@@ -121,19 +111,17 @@ export default function CformEditor(props: any) {
   }
 
   const getExisting = async () => {
-    if (params.section !== localStorage.getItem('section')) {
-      navigate(`/${params.section}/login`)
-      props.setSection('')
-      return
-    }
-    const coverage = await fetch(`${host}/coverage/${params.date}`, {
-      // @ts-expect-error bad TS
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-TOKEN': getCookie('csrf_access_token')
-      },
-      credentials: 'include'
-    })
+    const coverage = await fetch(
+      `${host}/${params.section}/coverage/${params.date}`,
+      {
+        // @ts-expect-error bad TS
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': getCookie('csrf_access_token')
+        },
+        credentials: 'include'
+      }
+    )
     if (coverage.ok) {
       const json = await coverage.json()
       setDate(dayjs(params.date!, 'YYYY-MM-DD'))
@@ -148,14 +136,17 @@ export default function CformEditor(props: any) {
       setHistory(json.history)
       setAkhlaq(json.akhlaq)
     }
-    const progress = await fetch(`${host}/progress/${params.date}`, {
-      // @ts-expect-error bad TS
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-TOKEN': getCookie('csrf_access_token')
-      },
-      credentials: 'include'
-    })
+    const progress = await fetch(
+      `${host}/${params.section}/progress/${params.date}`,
+      {
+        // @ts-expect-error bad TS
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': getCookie('csrf_access_token')
+        },
+        credentials: 'include'
+      }
+    )
     if (progress.ok) {
       const json = await progress.json()
       const entryStudents = json.students.map((student: Student) => {
@@ -196,12 +187,7 @@ export default function CformEditor(props: any) {
   }
 
   async function getPeople(type: string, existingIds?: string[]) {
-    if (params.section !== localStorage.getItem('section')) {
-      navigate(`/${params.section}/login`)
-      props.setSection('')
-      return
-    }
-    const res = await fetch(`${host}/people/${type}`, {
+    const res = await fetch(`${host}/${params.section}/people/${type}`, {
       // @ts-expect-error TS BEING DUMB
       headers: {
         'Content-Type': 'application/json',
@@ -246,12 +232,7 @@ export default function CformEditor(props: any) {
   }
 
   async function getLast() {
-    if (params.section !== localStorage.getItem('section')) {
-      navigate(`/${params.section}/login`)
-      props.setSection('')
-      return
-    }
-    const coverage = await fetch(`${host}/coverage/last`, {
+    const coverage = await fetch(`${host}/${params.section}/coverage/last`, {
       // @ts-expect-error bad TS
       headers: {
         'Content-Type': 'application/json',
@@ -279,12 +260,7 @@ export default function CformEditor(props: any) {
   }
 
   const addProgress = async (values: any) => {
-    if (params.section !== localStorage.getItem('section')) {
-      navigate(`/${params.section}/login`)
-      props.setSection('')
-      return false
-    }
-    const res = await fetch(`${host}/progress`, {
+    const res = await fetch(`${host}/${params.section}/progress`, {
       method: 'post',
       body: JSON.stringify({
         date: values.date,
@@ -302,11 +278,6 @@ export default function CformEditor(props: any) {
   }
 
   const updateProgress = async (date: string, values: any) => {
-    if (params.section !== localStorage.getItem('section')) {
-      navigate(`/${params.section}/login`)
-      props.setSection('')
-      return
-    }
     const updateStudents = values.students.filter((s: Student, idx: number) => {
       if (students[idx].visible && !students[idx].new) {
         return true
@@ -331,7 +302,7 @@ export default function CformEditor(props: any) {
       }
       return false
     })
-    const res = await fetch(`${host}/progress`, {
+    const res = await fetch(`${host}/${params.section}/progress`, {
       method: 'put',
       body: JSON.stringify({
         date: date,
@@ -448,6 +419,16 @@ export default function CformEditor(props: any) {
   useEffect(() => {
     initialize()
   }, [])
+  if (props.role === 'admin') {
+    return (
+      <div className="mx-4 mt-4">
+        {props.mode === 'new' && <h2>New CForm Entry</h2>}
+        {props.mode === 'view' && <h2>View CForm Entry</h2>}
+        {props.mode === 'edit' && <h2>Edit CForm Entry</h2>}
+        <p>Coming soon!</p>
+      </div>
+    )
+  }
   if (!loaded) {
     return (
       <Flex

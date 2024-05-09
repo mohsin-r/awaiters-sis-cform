@@ -36,16 +36,16 @@ function Login(props: any) {
         }
         throw new Error()
       })
-      .then(() => {
-        props.setSection(section)
-        localStorage.setItem('section', section!)
+      .then((json) => {
         messageApi.destroy()
         messageApi.success('Login was successful. Redirecting...')
         setTimeout(() => {
+          props.setSection(values.class)
+          props.setRole(json.role)
           setLoading(false)
-          navigate(`/${section}/cform`)
+          navigate(`/${values.class}/cform`)
           props.setStarted(true)
-        }, 2000)
+        }, 1500)
       })
       .catch(() => {
         messageApi.destroy()

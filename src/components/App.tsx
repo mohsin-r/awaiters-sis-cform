@@ -8,24 +8,21 @@ import {
 import { useEffect, useState } from 'react'
 import { ConfigProvider, Flex, Spin } from 'antd'
 import Layout from 'components/Layout'
-import Sis from 'components/Sis'
-import Cform from 'components/Cform'
-import CformEditor from 'components/CformEditor'
+import Sis from 'components/sis/Sis'
+import Cform from 'components/c-form/Cform'
+import CformEditor from 'components/c-form/CformEditor'
 import logo from 'assets/logo.png'
 
-import Login from 'components/Login'
+import Login from 'components/login/Login'
 import { getCookie, host } from 'utils'
-import Teachers from 'components/Teachers'
-import Grades from 'components/Grades'
-import Reports from 'components/Reports'
+import Teachers from 'components/teachers/Teachers'
+import Grades from 'components/grades/Grades'
+import Reports from 'components/reports/Reports'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function RequireAuth(props: { class: string | undefined; children: any }) {
   const params = useParams()
-  if (
-    props.class !== params.section ||
-    props.class !== localStorage.getItem('section')
-  ) {
+  if (props.class !== params.section) {
     return <Navigate to={`/${params.section}/login`} />
   }
   return props.children
@@ -34,16 +31,14 @@ function RequireAuth(props: { class: string | undefined; children: any }) {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function AlreadyLoggedIn(props: { class: string | undefined; children: any }) {
   const params = useParams()
-  if (
-    props.class === params.section &&
-    props.class === localStorage.getItem('section')
-  ) {
+  if (props.class === params.section) {
     return <Navigate to={`/${params.section}/cform`} />
   }
   return props.children
 }
 
 function App() {
+  const [role, setRole] = useState('')
   const [section, setSection] = useState('')
   const [loaded, setLoaded] = useState(false)
   const [started, setStarted] = useState(false)
@@ -66,10 +61,11 @@ function App() {
             setLoaded(true)
           }
         })
-        .then((json) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .then((json: any) => {
           if (json) {
-            localStorage.setItem('section', json.class)
-            setSection(json.class)
+            setSection(json.user)
+            setRole(json.role)
             setLoaded(true)
           }
         })
@@ -145,6 +141,7 @@ function App() {
                     setSection={setSection}
                     started={started}
                     setStarted={setStarted}
+                    setRole={setRole}
                   />
                 </AlreadyLoggedIn>
               }
@@ -153,27 +150,44 @@ function App() {
               path="/:section/"
               element={
                 <RequireAuth class={section}>
-                  <Layout setSection={setSection} />
+                  <Layout role={role} setSection={setSection} />
                 </RequireAuth>
               }
             >
-              <Route path="sis" element={<Sis setSection={setSection} />} />
-              <Route path="teachers" element={<Teachers />} />
-              <Route path="cform" element={<Cform setSection={setSection} />} />
+              <Route
+                path="sis"
+                element={<Sis setSection={setSection} role={role} />}
+              />
+              <Route path="teachers" element={<Teachers role={role} />} />
+              <Route path="cform" element={<Cform role={role} />} />
               <Route
                 path="cform/new"
-                element={<CformEditor setSection={setSection} mode="new" />}
+                element={
+                  <CformEditor setSection={setSection} mode="new" role={role} />
+                }
               />
               <Route
                 path="cform/view/:date"
-                element={<CformEditor setSection={setSection} mode="view" />}
+                element={
+                  <CformEditor
+                    setSection={setSection}
+                    mode="view"
+                    role={role}
+                  />
+                }
               />
               <Route
                 path="cform/edit/:date"
-                element={<CformEditor setSection={setSection} mode="edit" />}
+                element={
+                  <CformEditor
+                    setSection={setSection}
+                    mode="edit"
+                    role={role}
+                  />
+                }
               />
-              <Route path="grades" element={<Grades />} />
-              <Route path="reports" element={<Reports />} />
+              <Route path="grades" element={<Grades role={role} />} />
+              <Route path="reports" element={<Reports role={role} />} />
             </Route>
           </Routes>
         </BrowserRouter>

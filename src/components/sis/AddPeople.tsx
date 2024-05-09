@@ -3,7 +3,7 @@ import { Button, Checkbox, Select, Modal, Form, Input, message } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 import { useEffect, useState } from 'react'
 import { getCookie, host } from 'utils'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 
 export default function AddPerson(props: {
   people: Array<any>
@@ -18,14 +18,8 @@ export default function AddPerson(props: {
   const [form] = Form.useForm()
   const [messageApi, contextHolder] = message.useMessage()
   const params = useParams()
-  const navigate = useNavigate()
 
   const loadPeople = async () => {
-    if (params.section !== localStorage.getItem('section')) {
-      navigate(`/${params.section}/login`)
-      props.setSection('')
-      return
-    }
     setLoading(true)
     const res = await fetch(`${host}/all/people`, {
       // @ts-expect-error TS BEING DUMB
@@ -64,18 +58,13 @@ export default function AddPerson(props: {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleSubmit = async (values: any) => {
-    if (params.section !== localStorage.getItem('section')) {
-      navigate(`/${params.section}/login`)
-      props.setSection('')
-      return
-    }
     if (existing && props.type === 'teacher') {
       const idx = Number(values.selection)
       values = existingOptions[idx]
       values.existing = true
     }
     setLoading(true)
-    fetch(`${host}/people`, {
+    fetch(`${host}/${params.section}/people`, {
       method: 'post',
       body: JSON.stringify({
         id: values.id,

@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import AddPeople from 'components/helpers/AddPeople'
-import TransferStudent from 'components/TransferStudent'
+import AddPeople from 'components/sis/AddPeople'
+import TransferStudent from 'components/sis/TransferStudent'
 import React, { useState, useEffect } from 'react'
 import { Form, Input, Popconfirm, Table, Typography } from 'antd'
 import { compareString, getCookie, host } from 'utils'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 
 export interface Person {
   key: string
@@ -97,9 +97,9 @@ const PersonTable = (props: {
   loading: boolean
   setSection: any
   type: string
+  classes: Array<any>
 }) => {
   const [form] = Form.useForm()
-  const navigate = useNavigate()
   const params = useParams()
   const [editingName, setEditingName] = useState('')
   const [usingDb, setUsingDb] = useState(false)
@@ -119,18 +119,13 @@ const PersonTable = (props: {
   }
 
   const remove = async (record: Partial<Person>) => {
-    if (params.section !== localStorage.getItem('section')) {
-      navigate(`/${params.section}/login`)
-      props.setSection('')
-      return
-    }
     const index = props.people.findIndex((person) => person.key === record.key)
     if (index !== -1) {
       const peopleCopy = [...props.people]
       peopleCopy.splice(index, 1)
       props.setPeople(peopleCopy)
       setUsingDb(true)
-      await fetch(`${host}/people`, {
+      await fetch(`${host}/${params.section}/people`, {
         method: 'delete',
         body: JSON.stringify({
           id: record.id,
@@ -152,11 +147,6 @@ const PersonTable = (props: {
   }
 
   const save = async (id: React.Key) => {
-    if (params.section !== localStorage.getItem('section')) {
-      navigate(`/${params.section}/login`)
-      props.setSection('')
-      return
-    }
     try {
       const row = (await form.validateFields()) as Person
 
@@ -171,7 +161,7 @@ const PersonTable = (props: {
         })
         props.setPeople(newData)
         setUsingDb(true)
-        await fetch(`${host}/people`, {
+        await fetch(`${host}/${params.section}/people`, {
           method: 'put',
           body: JSON.stringify({
             id: id,
@@ -260,6 +250,7 @@ const PersonTable = (props: {
                 id={record.id}
                 setSection={props.setSection}
                 remove={removeLocal}
+                classes={props.classes}
               />
             )}
             <Popconfirm
@@ -321,17 +312,11 @@ const PersonTable = (props: {
 function People(props: any) {
   const [people, setPeople] = useState([])
   const [loading, setLoading] = useState(false)
+  const [classes, setClasses] = useState([])
   const params = useParams()
-  const navigate = useNavigate()
 
   const loadPeople = async () => {
-    if (params.section !== localStorage.getItem('section')) {
-      navigate(`/${params.section}/login`)
-      props.setSection('')
-      return
-    }
-    setLoading(true)
-    const res = await fetch(`${host}/people/${props.type}`, {
+    const res = await fetch(`${host}/${params.section}/people/${props.type}`, {
       // @ts-expect-error TS BEING DUMB
       headers: {
         'Content-Type': 'application/json',
@@ -348,8 +333,32 @@ function People(props: any) {
     )
     setLoading(false)
   }
+
+  const loadClasses = async () => {
+    setLoading(true)
+    const res = await fetch(`${host}/classes`, {
+      // @ts-expect-error TS BEING DUMB
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': getCookie('csrf_access_token')
+      },
+      credentials: 'include'
+    })
+    const json = await res.json()
+    setClasses(
+      json.map((cl: string) => {
+        return { label: cl.toUpperCase(), value: cl }
+      })
+    )
+  }
+
+  const load = async () => {
+    await loadClasses()
+    await loadPeople()
+  }
+
   useEffect(() => {
-    loadPeople()
+    load()
   }, [])
   return (
     <div className="mx-4 mt-4">
@@ -370,6 +379,7 @@ function People(props: any) {
         people={people}
         setPeople={setPeople}
         type={props.type}
+        classes={classes}
       />
     </div>
   )

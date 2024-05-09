@@ -21,7 +21,12 @@ function Navbar(props: any) {
   const items: MenuProps['items'] = [
     {
       label: (
-        <label className="text-black">{`Class: ${params.section!.toUpperCase()}`}</label>
+        <label className="text-black">
+          {props.role === 'teacher'
+            ? `Class: ${params.section!.toUpperCase()}`
+            : params.section!.charAt(0).toUpperCase() +
+              params.section!.slice(1)}
+        </label>
       ),
       key: 'class',
       disabled: true

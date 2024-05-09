@@ -11,7 +11,7 @@ interface DataType {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function Cform(props: any) {
+function Cform(props: { role: string }) {
   const params = useParams()
   const navigate = useNavigate()
   const [dates, setDates] = useState([] as DataType[])
@@ -64,13 +64,8 @@ function Cform(props: any) {
   ]
 
   useEffect(() => {
-    if (params.section !== localStorage.getItem('section')) {
-      navigate(`/${params.section}/login`)
-      props.setSection('')
-      return
-    }
     setLoading(true)
-    fetch(`${host}/dates`, {
+    fetch(`${host}/${params.section}/dates`, {
       // @ts-expect-error TS BEING DUMB
       headers: {
         'Content-Type': 'application/json',
@@ -101,18 +96,13 @@ function Cform(props: any) {
   }, [])
 
   const remove = async (date: string) => {
-    if (params.section !== localStorage.getItem('section')) {
-      navigate(`/${params.section}/login`)
-      props.setSection('')
-      return
-    }
     const index = dates.findIndex((d) => d.date === date)
     if (index !== -1) {
       const datesCopy = [...dates]
       datesCopy.splice(index, 1)
       setDates(datesCopy)
       setDeleting(true)
-      await fetch(`${host}/coverage`, {
+      await fetch(`${host}/${params.section}/coverage`, {
         method: 'delete',
         body: JSON.stringify({
           date: date
@@ -124,7 +114,7 @@ function Cform(props: any) {
         },
         credentials: 'include'
       })
-      await fetch(`${host}/progress`, {
+      await fetch(`${host}/${params.section}/progress`, {
         method: 'delete',
         body: JSON.stringify({
           date: date
@@ -140,10 +130,18 @@ function Cform(props: any) {
     }
   }
 
+  if (props.role === 'admin') {
+    return (
+      <div className="mx-4 mt-4">
+        <h2 className="m-0">C-Form Entries</h2>
+        <p>Coming soon!</p>
+      </div>
+    )
+  }
   return (
     <div className="mx-4 mt-4">
       <div className="flex items-center">
-        <h2 className="m-0">CForm Entries</h2>
+        <h2 className="m-0">C-Form Entries</h2>
         <Button
           className="ml-auto"
           type="primary"
@@ -157,7 +155,7 @@ function Cform(props: any) {
       </div>
       <Table
         bordered
-        className="mt-4"
+        className="mt-4 overflow-x-scroll"
         columns={columns}
         dataSource={dates}
         loading={loading}
