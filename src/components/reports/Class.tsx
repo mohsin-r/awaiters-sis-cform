@@ -55,7 +55,7 @@ export function TeacherPanel(props: { teacher: TeacherType }) {
       <Descriptions.Item label="Percent Attendance">
         {props.teacher.percentAttendanceWithoutPenalty}
       </Descriptions.Item>
-      <Descriptions.Item label="Percent Attendance (with penalty)">
+      <Descriptions.Item label="Percent Attendance (with 10% late penaltye penalty)">
         {props.teacher.percentAttendanceWithPenalty}
       </Descriptions.Item>
       <Descriptions.Item label="Average Minutes Late">
@@ -67,7 +67,7 @@ export function TeacherPanel(props: { teacher: TeacherType }) {
 
 export function StudentPanel(props: { student: StudentType }) {
   return (
-    <Descriptions column={{ xs: 1, sm: 1, md: 2, lg: 2, xl: 3, xxl: 3 }}>
+    <Descriptions column={{ xs: 1, sm: 1, md: 1, lg: 2, xl: 3, xxl: 3 }}>
       <Descriptions.Item label="Student ID">
         {props.student.id}
       </Descriptions.Item>
@@ -80,7 +80,7 @@ export function StudentPanel(props: { student: StudentType }) {
       <Descriptions.Item label="Percent Attendance">
         {props.student.percentAttendanceWithoutPenalty}
       </Descriptions.Item>
-      <Descriptions.Item label="Percent Attendance (with penalty)">
+      <Descriptions.Item label="Percent Attendance (with 10% late penalty)">
         {props.student.percentAttendanceWithPenalty}
       </Descriptions.Item>
       <Descriptions.Item label="Average Minutes Late">
@@ -131,7 +131,7 @@ export default function Class(props: { report: any }) {
         compareRecords(a, b, 'percentAttendanceWithoutPenalty')
     },
     {
-      title: 'Percent Attendance (with penalty)',
+      title: 'Percent Attendance (with 10% late penalty)',
       dataIndex: 'percentAttendanceWithPenalty',
       width: '20%',
       sorter: (a: any, b: any) =>
@@ -191,7 +191,7 @@ export default function Class(props: { report: any }) {
         compareRecords(a, b, 'percentAttendanceWithoutPenalty')
     },
     {
-      title: 'Percent Attendance (with penalty)',
+      title: 'Percent Attendance (with 10% late penalty)',
       dataIndex: 'percentAttendanceWithPenalty',
       width: '14.3%',
       render: (_: any, student: StudentType) => {

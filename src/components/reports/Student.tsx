@@ -38,7 +38,7 @@ const studentColumns: TableProps<StudentType>['columns'] = [
       compareRecords(a, b, 'percentAttendanceWithoutPenalty')
   },
   {
-    title: 'Percent Attendance (with penalty)',
+    title: 'Percent Attendance (with 10% late penalty)',
     dataIndex: 'percentAttendanceWithPenalty',
     sorter: (a: any, b: any) =>
       compareRecords(a, b, 'percentAttendanceWithPenalty')
@@ -72,7 +72,7 @@ const studentColumns: TableProps<StudentType>['columns'] = [
 
 export function DetailedStudentPanel(props: { report: StudentType }) {
   return (
-    <Descriptions column={{ xs: 1, sm: 1, md: 2, lg: 2, xl: 3, xxl: 3 }}>
+    <Descriptions column={{ xs: 1, sm: 1, md: 1, lg: 2, xl: 3, xxl: 3 }}>
       <Descriptions.Item label="Student ID">
         {props.report.id}
       </Descriptions.Item>
@@ -85,7 +85,7 @@ export function DetailedStudentPanel(props: { report: StudentType }) {
       <Descriptions.Item label="Percent Attendance">
         {props.report.percentAttendanceWithoutPenalty}
       </Descriptions.Item>
-      <Descriptions.Item label="Percent Attendance (with penalty)">
+      <Descriptions.Item label="Percent Attendance (with 10% late penalty)">
         {props.report.percentAttendanceWithPenalty}
       </Descriptions.Item>
       <Descriptions.Item label="Classes Late">

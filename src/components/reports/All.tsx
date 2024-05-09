@@ -4,7 +4,7 @@ import { compareRecords } from 'utils'
 
 export function ClassPanel(props: { cl: ClassType }) {
   return (
-    <Descriptions column={{ xs: 1, sm: 1, md: 1, lg: 2, xl: 3, xxl: 3 }}>
+    <Descriptions column={{ xs: 1, sm: 1, md: 1, lg: 2, xl: 2, xxl: 3 }}>
       <Descriptions.Item label="Class Number">
         {props.cl.class.toUpperCase()}
       </Descriptions.Item>
@@ -21,7 +21,7 @@ export function ClassPanel(props: { cl: ClassType }) {
       <Descriptions.Item label="Average Percent Attendance">
         {props.cl.averagePercentAttendanceWithoutPenalty}
       </Descriptions.Item>
-      <Descriptions.Item label="Average Percent Attendance (with penalty)">
+      <Descriptions.Item label="Average Percent Attendance (with 10% late penalty)">
         {props.cl.averagePercentAttendanceWithPenalty}
       </Descriptions.Item>
       <Descriptions.Item label="Average Minutes Late">
@@ -80,7 +80,7 @@ const classColumns: TableProps<ClassType>['columns'] = [
       compareRecords(a, b, 'averagePercentAttendanceWithoutPenalty')
   },
   {
-    title: 'Average Percent Attendance (with penalty)',
+    title: 'Average Percent Attendance (with 10% late penalty)',
     dataIndex: 'averagePercentAttendanceWithPenalty',
     sorter: (a: any, b: any) =>
       compareRecords(a, b, 'averagePercentAttendanceWithPenalty')
