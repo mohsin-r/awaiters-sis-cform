@@ -52,9 +52,14 @@ function Reports(props: { role: string }) {
     })
     const json = await res.json()
     setClasses(
-      json.map((cl: string) => {
-        return { label: cl.toUpperCase(), value: cl }
-      })
+      json
+        .map((cl: any) => {
+          return { label: cl.class.toUpperCase(), value: cl.class }
+        })
+        .sort(
+          (a: any, b: any) =>
+            Number(a.value.slice(2)) - Number(b.value.slice(2))
+        )
     )
     setInitializing(false)
   }
@@ -141,15 +146,22 @@ function Reports(props: { role: string }) {
         })
         delete json.students
       } else {
-        json.classesTable = json.classes
-        json.classesList = json.classes.map((cl: any) => {
-          const newClass: any = {
-            key: cl.class,
-            label: cl.class.toUpperCase()
-          }
-          newClass.children = <ClassPanel cl={cl} />
-          return newClass
-        })
+        json.classesTable = json.classes.sort(
+          (a: any, b: any) =>
+            Number(a.class.slice(2)) - Number(b.class.slice(2))
+        )
+        json.classesList = json.classes
+          .map((cl: any) => {
+            const newClass: any = {
+              key: cl.class,
+              label: cl.class.toUpperCase()
+            }
+            newClass.children = <ClassPanel cl={cl} />
+            return newClass
+          })
+          .sort(
+            (a: any, b: any) => Number(a.key.slice(2)) - Number(b.key.slice(2))
+          )
         delete json.classes
       }
       messageApi.success('Successfully generated reports.')

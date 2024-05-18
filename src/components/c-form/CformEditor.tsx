@@ -147,36 +147,33 @@ export default function CformEditor(props: any) {
         credentials: 'include'
       }
     )
+    let entryStudents: Student[] = []
+    let existingStudentIds = []
+    let entryTeachers: Teacher[] = []
+    let existingTeacherIds = []
     if (progress.ok) {
       const json = await progress.json()
-      const entryStudents = json.students.map((student: Student) => {
+      entryStudents = json.students.map((student: Student) => {
         student.key = student.name
         student.visible = true
         return student
       })
-      const existingStudentIds = json.students.map(
-        (student: Student) => student.id
-      )
-      if (props.mode === 'edit') {
-        const remainingStudents = await getPeople('student', existingStudentIds)
-        setStudents([...entryStudents, ...remainingStudents])
-      } else {
-        setStudents(entryStudents)
-      }
-      const entryTeachers = json.teachers.map((teacher: Teacher) => {
+      existingStudentIds = json.students.map((student: Student) => student.id)
+      entryTeachers = json.teachers.map((teacher: Teacher) => {
         teacher.key = teacher.name
         teacher.visible = true
         return teacher
       })
-      const existingTeacherIds = json.teachers.map(
-        (teacher: Teacher) => teacher.id
-      )
-      if (props.mode === 'edit') {
-        const remainingTeachers = await getPeople('teacher', existingTeacherIds)
-        setTeachers([...entryTeachers, ...remainingTeachers])
-      } else {
-        setTeachers(entryTeachers)
-      }
+      existingTeacherIds = json.teachers.map((teacher: Teacher) => teacher.id)
+    }
+    if (props.mode === 'edit') {
+      const remainingStudents = await getPeople('student', existingStudentIds)
+      setStudents([...entryStudents, ...remainingStudents])
+      const remainingTeachers = await getPeople('teacher', existingTeacherIds)
+      setTeachers([...entryTeachers, ...remainingTeachers])
+    } else {
+      setStudents(entryStudents)
+      setTeachers(entryTeachers)
     }
     setTimeout(() => {
       setLoaded(true)
@@ -362,7 +359,7 @@ export default function CformEditor(props: any) {
         messageApi.success('Successfully added record. Redirecting...')
         setTimeout(() => {
           setSubmitting(false)
-          navigate(`/${params.section}/cform`)
+          navigate(`/${params.section}/c-form`)
         }, 1500)
       } else {
         messageApi.error(
@@ -384,7 +381,7 @@ export default function CformEditor(props: any) {
         messageApi.success('Successfully updated record. Redirecting...')
         setTimeout(() => {
           setSubmitting(false)
-          navigate(`/${params.section}/cform`)
+          navigate(`/${params.section}/c-form`)
         }, 1500)
       } else {
         messageApi.error(
@@ -419,16 +416,6 @@ export default function CformEditor(props: any) {
   useEffect(() => {
     initialize()
   }, [])
-  if (props.role === 'admin') {
-    return (
-      <div className="mx-4 mt-4">
-        {props.mode === 'new' && <h2>New CForm Entry</h2>}
-        {props.mode === 'view' && <h2>View CForm Entry</h2>}
-        {props.mode === 'edit' && <h2>Edit CForm Entry</h2>}
-        <p>Coming soon!</p>
-      </div>
-    )
-  }
   if (!loaded) {
     return (
       <Flex
@@ -445,18 +432,18 @@ export default function CformEditor(props: any) {
     <div className="mx-4">
       {contextHolder}
       <div className="flex items-center">
-        {props.mode === 'new' && <h2>New CForm Entry</h2>}
-        {props.mode === 'view' && <h2>View CForm Entry</h2>}
-        {props.mode === 'edit' && <h2>Edit CForm Entry</h2>}
+        {props.mode === 'new' && <h2>New C-Form Entry</h2>}
+        {props.mode === 'view' && <h2>View C-Form Entry</h2>}
+        {props.mode === 'edit' && <h2>Edit C-Form Entry</h2>}
         <Button
           disabled={submitting}
           onClick={() => {
-            navigate(`/${params.section}/cform`)
+            navigate(`/${params.section}/c-form`)
           }}
           type="primary"
           className="ml-auto"
         >
-          Back to CForm Entries
+          Back to C-Form Entries
         </Button>
       </div>
       {notFound &&

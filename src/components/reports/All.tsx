@@ -21,7 +21,10 @@ export function ClassPanel(props: { cl: ClassType }) {
       <Descriptions.Item label="Average Percent Attendance">
         {props.cl.averagePercentAttendanceWithoutPenalty}
       </Descriptions.Item>
-      <Descriptions.Item label="Average Percent Attendance (with 10% late penalty)">
+      <Descriptions.Item
+        labelStyle={{ maxWidth: '80%' }}
+        label="Average Percent Attendance (with 10% late penalty)"
+      >
         {props.cl.averagePercentAttendanceWithPenalty}
       </Descriptions.Item>
       <Descriptions.Item label="Average Minutes Late">

@@ -43,7 +43,11 @@ function Login(props: any) {
           props.setSection(values.class)
           props.setRole(json.role)
           setLoading(false)
-          navigate(`/${values.class}/cform`)
+          if (json.role === 'teacher') {
+            navigate(`/${values.class}/c-form`)
+          } else {
+            navigate(`/${values.class}/classes`)
+          }
           props.setStarted(true)
         }, 1500)
       })
@@ -75,7 +79,7 @@ function Login(props: any) {
     <div className="flex h-screen flex-col items-center justify-center rounded-lg text-[#3b7273]">
       {contextHolder}
       <img src={logo} className="h-20"></img>
-      <h1 className="text-center">Login to the SIS and CForm</h1>
+      <h1 className="text-center">Login to the SIS and C-Form</h1>
       <Form
         disabled={loading}
         size="large"

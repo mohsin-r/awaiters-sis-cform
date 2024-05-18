@@ -18,6 +18,9 @@ import { getCookie, host } from 'utils'
 import Teachers from 'components/teachers/Teachers'
 import Grades from 'components/grades/Grades'
 import Reports from 'components/reports/Reports'
+import Holidays from 'components/holidays/Holidays'
+import Classes from 'components/classes/Classes'
+import NotFound from 'components/NotFound'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function RequireAuth(props: { class: string | undefined; children: any }) {
@@ -32,7 +35,7 @@ function RequireAuth(props: { class: string | undefined; children: any }) {
 function AlreadyLoggedIn(props: { class: string | undefined; children: any }) {
   const params = useParams()
   if (props.class === params.section) {
-    return <Navigate to={`/${params.section}/cform`} />
+    return <Navigate to={`/${params.section}/c-form`} />
   }
   return props.children
 }
@@ -154,40 +157,39 @@ function App() {
                 </RequireAuth>
               }
             >
-              <Route
-                path="sis"
-                element={<Sis setSection={setSection} role={role} />}
-              />
-              <Route path="teachers" element={<Teachers role={role} />} />
-              <Route path="cform" element={<Cform role={role} />} />
-              <Route
-                path="cform/new"
-                element={
-                  <CformEditor setSection={setSection} mode="new" role={role} />
-                }
-              />
-              <Route
-                path="cform/view/:date"
-                element={
-                  <CformEditor
-                    setSection={setSection}
-                    mode="view"
-                    role={role}
+              {role === 'teacher' && (
+                <>
+                  <Route path="sis" element={<Sis setSection={setSection} />} />
+                  <Route path="teachers" element={<Teachers />} />
+                  <Route path="c-form" element={<Cform />} />
+                  <Route
+                    path="c-form/new"
+                    element={<CformEditor setSection={setSection} mode="new" />}
                   />
-                }
-              />
-              <Route
-                path="cform/edit/:date"
-                element={
-                  <CformEditor
-                    setSection={setSection}
-                    mode="edit"
-                    role={role}
+                  <Route
+                    path="c-form/view/:date"
+                    element={
+                      <CformEditor setSection={setSection} mode="view" />
+                    }
                   />
-                }
-              />
-              <Route path="grades" element={<Grades role={role} />} />
+                  <Route
+                    path="c-form/edit/:date"
+                    element={
+                      <CformEditor setSection={setSection} mode="edit" />
+                    }
+                  />
+                  <Route path="grades" element={<Grades />} />
+                </>
+              )}
+              {role === 'admin' && (
+                <>
+                  <Route path="holidays" element={<Holidays />} />
+                  <Route path="classes" element={<Classes />} />
+                </>
+              )}
+
               <Route path="reports" element={<Reports role={role} />} />
+              <Route path="*" element={<NotFound />} />
             </Route>
           </Routes>
         </BrowserRouter>

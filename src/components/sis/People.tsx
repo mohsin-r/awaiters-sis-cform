@@ -290,7 +290,7 @@ const PersonTable = (props: {
     <Form form={form} component={false}>
       <Table
         loading={props.loading}
-        className="mt-4"
+        className="mt-4 overflow-x-scroll"
         components={{
           body: {
             cell: EditableCell
@@ -346,8 +346,8 @@ function People(props: any) {
     })
     const json = await res.json()
     setClasses(
-      json.map((cl: string) => {
-        return { label: cl.toUpperCase(), value: cl }
+      json.map((cl: any) => {
+        return { label: cl.class.toUpperCase(), value: cl.class }
       })
     )
   }

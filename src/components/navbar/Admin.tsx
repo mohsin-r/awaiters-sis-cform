@@ -3,18 +3,16 @@ import { Menu } from 'antd'
 import type { MenuProps } from 'antd'
 import { useLocation } from 'react-router-dom'
 import {
-  FormOutlined,
-  LogoutOutlined,
-  DatabaseOutlined,
+  CoffeeOutlined,
   ExceptionOutlined,
-  CheckSquareOutlined,
-  UserOutlined
+  LogoutOutlined,
+  GroupOutlined
 } from '@ant-design/icons'
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { host } from 'utils'
 
-function Navbar(props: any) {
+function AdminNavbar(props: any) {
   const navigate = useNavigate()
   const location = useLocation()
   const params = useParams()
@@ -22,34 +20,21 @@ function Navbar(props: any) {
     {
       label: (
         <label className="text-black">
-          {props.role === 'teacher'
-            ? `Class: ${params.section!.toUpperCase()}`
-            : params.section!.charAt(0).toUpperCase() +
-              params.section!.slice(1)}
+          {params.section!.charAt(0).toUpperCase() + params.section!.slice(1)}
         </label>
       ),
       key: 'class',
       disabled: true
     },
     {
-      label: 'SIS',
-      key: 'sis',
-      icon: <DatabaseOutlined />
+      label: 'Classes',
+      key: 'classes',
+      icon: <GroupOutlined />
     },
     {
-      label: 'Teachers',
-      key: 'teachers',
-      icon: <UserOutlined />
-    },
-    {
-      label: 'C-Form',
-      key: 'cform',
-      icon: <FormOutlined />
-    },
-    {
-      label: 'Grades',
-      key: 'grades',
-      icon: <CheckSquareOutlined />
+      label: 'Holidays',
+      key: 'holidays',
+      icon: <CoffeeOutlined />
     },
     {
       label: 'Reports',
@@ -64,31 +49,21 @@ function Navbar(props: any) {
   ]
 
   const [current, setCurrent] = useState(() => {
-    if (location.pathname.includes('sis')) {
-      return 'sis'
-    } else if (location.pathname.includes('teachers')) {
-      return 'teachers'
-    } else if (location.pathname.includes('cform')) {
-      return 'cform'
-    } else if (location.pathname.includes('grades')) {
-      return 'grades'
-    } else {
+    if (location.pathname.includes('holidays')) {
+      return 'holidays'
+    } else if (location.pathname.includes('classes')) {
+      return 'classes'
+    } else if (location.pathname.includes('reports')) {
       return 'reports'
+    } else {
+      return ''
     }
   })
 
   const onClick: MenuProps['onClick'] = (e) => {
     setCurrent(e.key)
-    if (e.key === 'sis') {
-      navigate(`/${params.section}/sis`)
-    } else if (e.key === 'teachers') {
-      navigate(`/${params.section}/teachers`)
-    } else if (e.key === 'cform') {
-      navigate(`/${params.section}/cform`)
-    } else if (e.key === 'grades') {
-      navigate(`/${params.section}/grades`)
-    } else if (e.key === 'reports') {
-      navigate(`/${params.section}/reports`)
+    if (e.key !== 'logout') {
+      navigate(`/${params.section}/${e.key}`)
     } else {
       const request = new Request(`${host}/logout`, {
         method: 'post',
@@ -122,4 +97,4 @@ function Navbar(props: any) {
   )
 }
 
-export default Navbar
+export default AdminNavbar

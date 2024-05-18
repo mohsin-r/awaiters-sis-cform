@@ -11,7 +11,7 @@ interface DataType {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function Cform(props: { role: string }) {
+function Cform() {
   const params = useParams()
   const navigate = useNavigate()
   const [dates, setDates] = useState([] as DataType[])
@@ -36,7 +36,7 @@ function Cform(props: { role: string }) {
           <Typography.Link
             disabled={deleting}
             onClick={() => {
-              navigate(`/${params.section}/cform/view/${record.date}`)
+              navigate(`/${params.section}/c-form/view/${record.date}`)
             }}
           >
             View
@@ -44,7 +44,7 @@ function Cform(props: { role: string }) {
           <Typography.Link
             disabled={deleting}
             onClick={() => {
-              navigate(`/${params.section}/cform/edit/${record.date}`)
+              navigate(`/${params.section}/c-form/edit/${record.date}`)
             }}
           >
             Edit
@@ -129,15 +129,6 @@ function Cform(props: { role: string }) {
       setDeleting(false)
     }
   }
-
-  if (props.role === 'admin') {
-    return (
-      <div className="mx-4 mt-4">
-        <h2 className="m-0">C-Form Entries</h2>
-        <p>Coming soon!</p>
-      </div>
-    )
-  }
   return (
     <div className="mx-4 mt-4">
       <div className="flex items-center">
@@ -146,7 +137,7 @@ function Cform(props: { role: string }) {
           className="ml-auto"
           type="primary"
           onClick={() => {
-            navigate(`/${params.section}/cform/new`)
+            navigate(`/${params.section}/c-form/new`)
           }}
         >
           <PlusOutlined />
