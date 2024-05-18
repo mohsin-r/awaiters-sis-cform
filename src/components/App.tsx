@@ -31,11 +31,19 @@ function RequireAuth(props: { class: string | undefined; children: any }) {
   return props.children
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function AlreadyLoggedIn(props: { class: string | undefined; children: any }) {
+function AlreadyLoggedIn(props: {
+  class: string | undefined
+  role: string | undefined
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  children: any
+}) {
   const params = useParams()
   if (props.class === params.section) {
-    return <Navigate to={`/${params.section}/c-form`} />
+    if (props.role === 'teacher') {
+      return <Navigate to={`/${params.section}/c-form`} />
+    } else {
+      return <Navigate to={`/${params.section}/classes`} />
+    }
   }
   return props.children
 }
@@ -61,6 +69,7 @@ function App() {
             return res.json()
           } else {
             setSection('')
+            setRole('')
             setLoaded(true)
           }
         })
@@ -139,7 +148,7 @@ function App() {
             <Route
               path="/:section/login"
               element={
-                <AlreadyLoggedIn class={section}>
+                <AlreadyLoggedIn class={section} role={role}>
                   <Login
                     setSection={setSection}
                     started={started}
