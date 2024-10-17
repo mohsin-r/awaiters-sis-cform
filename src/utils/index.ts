@@ -12,7 +12,17 @@ export function getCookie(name: string) {
   }
 }
 
+function isNumeric(str: any) {
+  return (
+    !isNaN(str as number) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
+    !isNaN(parseFloat(str))
+  ) // ...and ensure strings of whitespace fail
+}
+
 export function compareString(a: string, b: string) {
+  if (isNumeric(a) && isNumeric(b)) {
+    return Number(a) - Number(b)
+  }
   if (a < b) {
     return -1
   } else if (a > b) {
@@ -23,7 +33,7 @@ export function compareString(a: string, b: string) {
 }
 
 export function compareRecords(a: any, b: any, field: string) {
-  return a[field] - b[field]
+  return compareString(a[field], b[field])
 }
 
 export const host = import.meta.env.VITE_API_HOST

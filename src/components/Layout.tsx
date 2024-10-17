@@ -6,12 +6,12 @@ import AdminNavbar from 'components/navbar/Admin'
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function Layout(props: { role: string; setSection: any }) {
   return (
-    <div className="flex flex-col">
+    <div className="flex min-h-screen flex-col">
       {props.role === 'teacher' && (
         <TeacherNavbar setSection={props.setSection} />
       )}
       {props.role === 'admin' && <AdminNavbar setSection={props.setSection} />}
-      <main>
+      <main className="relative grow">
         <Outlet />
       </main>
     </div>

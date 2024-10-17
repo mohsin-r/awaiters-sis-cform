@@ -3,11 +3,13 @@ import {
   Collapse,
   CollapseProps,
   Descriptions,
+  Flex,
   Table,
   TableProps,
   Tabs
 } from 'antd'
 import { compareString, compareRecords } from 'utils'
+import LatePenalty from './LatePenalty'
 
 interface CoverageType {
   subject: string
@@ -29,6 +31,7 @@ interface StudentType {
   averageMinutesLate: number
   classesAttended: number
   totalAyahs: number
+  marks: string | Array<string>
 }
 
 export function CoveragePanel(props: { coverage: CoverageType }) {
@@ -55,7 +58,7 @@ export function TeacherPanel(props: { teacher: TeacherType }) {
       <Descriptions.Item label="Percent Attendance">
         {props.teacher.percentAttendanceWithoutPenalty}
       </Descriptions.Item>
-      <Descriptions.Item label="Percent Attendance (with 10% late penaltye penalty)">
+      <Descriptions.Item label="Percent Attendance (with late penalty penalty)">
         {props.teacher.percentAttendanceWithPenalty}
       </Descriptions.Item>
       <Descriptions.Item label="Average Minutes Late">
@@ -67,29 +70,38 @@ export function TeacherPanel(props: { teacher: TeacherType }) {
 
 export function StudentPanel(props: { student: StudentType }) {
   return (
-    <Descriptions column={{ xs: 1, sm: 1, md: 1, lg: 2, xl: 3, xxl: 3 }}>
-      <Descriptions.Item label="Student ID">
-        {props.student.id}
-      </Descriptions.Item>
-      <Descriptions.Item label="Full Name">
-        {props.student.name}
-      </Descriptions.Item>
-      <Descriptions.Item label="Classes Attended">
-        {props.student.classesAttended}
-      </Descriptions.Item>
-      <Descriptions.Item label="Percent Attendance">
-        {props.student.percentAttendanceWithoutPenalty}
-      </Descriptions.Item>
-      <Descriptions.Item label="Percent Attendance (with 10% late penalty)">
-        {props.student.percentAttendanceWithPenalty}
-      </Descriptions.Item>
-      <Descriptions.Item label="Average Minutes Late">
-        {props.student.averageMinutesLate}
-      </Descriptions.Item>
-      <Descriptions.Item label="Total Ayaat Recited">
-        {props.student.totalAyahs}
-      </Descriptions.Item>
-    </Descriptions>
+    <div>
+      <Descriptions column={{ xs: 1, sm: 1, md: 1, lg: 2, xl: 3, xxl: 3 }}>
+        <Descriptions.Item label="Student ID">
+          {props.student.id}
+        </Descriptions.Item>
+        <Descriptions.Item label="Full Name">
+          {props.student.name}
+        </Descriptions.Item>
+        <Descriptions.Item label="Classes Attended">
+          {props.student.classesAttended}
+        </Descriptions.Item>
+        <Descriptions.Item label="Percent Attendance">
+          {props.student.percentAttendanceWithoutPenalty}
+        </Descriptions.Item>
+        <Descriptions.Item label="Percent Attendance (with late penalty)">
+          {props.student.percentAttendanceWithPenalty}
+        </Descriptions.Item>
+        <Descriptions.Item label="Average Minutes Late">
+          {props.student.averageMinutesLate}
+        </Descriptions.Item>
+        <Descriptions.Item label="Total Ayaat Recited">
+          {props.student.totalAyahs}
+        </Descriptions.Item>
+      </Descriptions>
+      <Descriptions column={{ xs: 1, sm: 1, md: 1, lg: 2, xl: 3, xxl: 3 }}>
+        <Descriptions.Item label="Course Marks">
+          {Array.isArray(props.student.marks)
+            ? props.student.marks.join(', ')
+            : props.student.marks}
+        </Descriptions.Item>
+      </Descriptions>
+    </div>
   )
 }
 
@@ -114,26 +126,24 @@ export default function Class(props: { report: any }) {
     {
       title: 'Teacher ID',
       dataIndex: 'id',
-      width: '20%'
+      fixed: 'left'
     },
     {
       title: 'Full Name',
       dataIndex: 'name',
-      width: '20%',
       sorter: (a: any, b: any) =>
-        compareString(a.name.toLowerCase(), b.name.toLowerCase())
+        compareString(a.name.toLowerCase(), b.name.toLowerCase()),
+      fixed: 'left'
     },
     {
       title: 'Percent Attendance',
       dataIndex: 'percentAttendanceWithoutPenalty',
-      width: '20%',
       sorter: (a: any, b: any) =>
         compareRecords(a, b, 'percentAttendanceWithoutPenalty')
     },
     {
-      title: 'Percent Attendance (with 10% late penalty)',
+      title: 'Percent Attendance (with late penalty)',
       dataIndex: 'percentAttendanceWithPenalty',
-      width: '20%',
       sorter: (a: any, b: any) =>
         compareRecords(a, b, 'percentAttendanceWithPenalty')
     },
@@ -147,12 +157,12 @@ export default function Class(props: { report: any }) {
     {
       title: 'Student ID',
       dataIndex: 'id',
-      width: '14.3%'
+      fixed: 'left',
+      width: 150
     },
     {
       title: 'Full Name',
       dataIndex: 'name',
-      width: '14.3%',
       render: (_: any, student: StudentType) => {
         return (
           <span className={student.id === '' ? 'font-bold' : ''}>
@@ -161,12 +171,13 @@ export default function Class(props: { report: any }) {
         )
       },
       sorter: (a: any, b: any) =>
-        compareString(a.name.toLowerCase(), b.name.toLowerCase())
+        compareString(a.name.toLowerCase(), b.name.toLowerCase()),
+      fixed: 'left',
+      width: 150
     },
     {
       title: 'Classes Attended',
       dataIndex: 'classesAttended',
-      width: '14.3%',
       render: (_: any, student: StudentType) => {
         return (
           <span className={student.id === '' ? 'font-bold' : ''}>
@@ -174,12 +185,12 @@ export default function Class(props: { report: any }) {
           </span>
         )
       },
-      sorter: (a: any, b: any) => compareRecords(a, b, 'classesAttended')
+      sorter: (a: any, b: any) => compareRecords(a, b, 'classesAttended'),
+      width: 150
     },
     {
       title: 'Percent Attendance',
       dataIndex: 'percentAttendanceWithoutPenalty',
-      width: '14.3%',
       render: (_: any, student: StudentType) => {
         return (
           <span className={student.id === '' ? 'font-bold' : ''}>
@@ -188,12 +199,12 @@ export default function Class(props: { report: any }) {
         )
       },
       sorter: (a: any, b: any) =>
-        compareRecords(a, b, 'percentAttendanceWithoutPenalty')
+        compareRecords(a, b, 'percentAttendanceWithoutPenalty'),
+      width: 150
     },
     {
-      title: 'Percent Attendance (with 10% late penalty)',
+      title: 'Percent Attendance (with late penalty)',
       dataIndex: 'percentAttendanceWithPenalty',
-      width: '14.3%',
       render: (_: any, student: StudentType) => {
         return (
           <span className={student.id === '' ? 'font-bold' : ''}>
@@ -202,12 +213,12 @@ export default function Class(props: { report: any }) {
         )
       },
       sorter: (a: any, b: any) =>
-        compareRecords(a, b, 'percentAttendanceWithPenalty')
+        compareRecords(a, b, 'percentAttendanceWithPenalty'),
+      width: 150
     },
     {
       title: 'Average Minutes Late',
       dataIndex: 'averageMinutesLate',
-      width: '14.3%',
       render: (_: any, student: StudentType) => {
         return (
           <span className={student.id === '' ? 'font-bold' : ''}>
@@ -215,7 +226,8 @@ export default function Class(props: { report: any }) {
           </span>
         )
       },
-      sorter: (a: any, b: any) => compareRecords(a, b, 'averageMinutesLate')
+      sorter: (a: any, b: any) => compareRecords(a, b, 'averageMinutesLate'),
+      width: 150
     },
     {
       title: 'Total Ayaat Recited',
@@ -225,6 +237,27 @@ export default function Class(props: { report: any }) {
           <span className={student.id === '' ? 'font-bold' : ''}>
             {student.totalAyahs}
           </span>
+        )
+      },
+      sorter: (a: any, b: any) => compareRecords(a, b, 'totalAyahs'),
+      width: 150
+    },
+    {
+      title: 'Course Marks',
+      dataIndex: 'marks',
+      render: (_: any, student: StudentType) => {
+        return student.marks === 'Not Available' ? (
+          <span className={student.id === '' ? 'font-bold' : ''}>
+            {student.marks}
+          </span>
+        ) : (
+          <Flex vertical>
+            {(student.marks as Array<string>).map((mark) => (
+              <span key={mark} className={student.id === '' ? 'font-bold' : ''}>
+                {mark}
+              </span>
+            ))}
+          </Flex>
         )
       },
       sorter: (a: any, b: any) => compareRecords(a, b, 'totalAyahs')
@@ -246,22 +279,28 @@ export default function Class(props: { report: any }) {
       key: '2',
       label: 'Teachers',
       children: (
-        <Collapse
-          className="my-2"
-          items={props.report.teachersList}
-          defaultActiveKey={[]}
-        />
+        <>
+          <LatePenalty className="mb-4" />
+          <Collapse
+            className="my-2"
+            items={props.report.teachersList}
+            defaultActiveKey={[]}
+          />
+        </>
       )
     },
     {
       key: '3',
       label: 'Students',
       children: (
-        <Collapse
-          className="my-2"
-          items={props.report.studentsList}
-          defaultActiveKey={[]}
-        />
+        <>
+          <LatePenalty className="mb-4" />
+          <Collapse
+            className="my-2"
+            items={props.report.studentsList}
+            defaultActiveKey={[]}
+          />
+        </>
       )
     }
   ]
@@ -299,26 +338,30 @@ export default function Class(props: { report: any }) {
                 <Table
                   bordered
                   title={() => <h4 className="m-0">Syllabus Coverage</h4>}
-                  className="mt-2 overflow-x-scroll"
+                  className="mt-2"
                   columns={coverageColumns}
                   dataSource={props.report.coverageTable}
                   pagination={{ hideOnSinglePage: true, defaultPageSize: 10 }}
+                  scroll={{ x: true }}
                 />
+                <LatePenalty className="mt-4" />
                 <Table
                   bordered
                   title={() => <h4 className="m-0">Teachers</h4>}
-                  className="mt-2 overflow-x-scroll"
+                  className="mt-4"
                   columns={teacherColumns}
                   dataSource={props.report.teachersTable}
                   pagination={{ hideOnSinglePage: true, defaultPageSize: 10 }}
+                  scroll={{ x: true }}
                 />
                 <Table
                   bordered
                   title={() => <h4 className="m-0">Students</h4>}
-                  className="my-2 overflow-x-scroll"
+                  className="my-4"
                   columns={studentColumns}
                   dataSource={props.report.studentsTable}
                   pagination={{ hideOnSinglePage: true, defaultPageSize: 100 }}
+                  scroll={{ x: 1500, y: 500 }}
                 />
               </>
             )

@@ -8,7 +8,8 @@ import {
   Divider,
   message,
   Flex,
-  Spin
+  Spin,
+  Table
 } from 'antd'
 import Class, {
   CoveragePanel,
@@ -20,7 +21,143 @@ import All, { ClassPanel } from 'components/reports/All'
 import { DetailedStudentPanel } from 'components/reports/Student'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { host, getCookie } from 'utils'
+import { host, getCookie, compareRecords, compareString } from 'utils'
+
+const courseGradeStatsColumns = [
+  {
+    title: 'Class Number',
+    dataIndex: 'classNumber',
+    render: (_: any, stat: any) => {
+      return <span>{stat.class.toUpperCase()}</span>
+    }
+  },
+  {
+    title: 'Average Mark',
+    dataIndex: 'averageMark',
+    sorter: (a: any, b: any) => compareRecords(a, b, 'averageMark')
+  },
+  {
+    title: 'Highest Mark',
+    dataIndex: 'highestMark',
+    sorter: (a: any, b: any) => compareRecords(a, b, 'highestMark')
+  },
+  {
+    title: 'Lowest Mark',
+    dataIndex: 'lowestMark',
+    sorter: (a: any, b: any) => compareRecords(a, b, 'lowestMark')
+  }
+]
+
+const classGradeStatsColumns = [
+  {
+    title: 'Course',
+    dataIndex: 'course',
+    width: '40%'
+  },
+  {
+    title: 'Average Mark',
+    dataIndex: 'averageMark',
+    sorter: (a: any, b: any) => compareRecords(a, b, 'averageMark')
+  },
+  {
+    title: 'Highest Mark',
+    dataIndex: 'highestMark',
+    sorter: (a: any, b: any) => compareRecords(a, b, 'highestMark')
+  },
+  {
+    title: 'Lowest Mark',
+    dataIndex: 'lowestMark',
+    sorter: (a: any, b: any) => compareRecords(a, b, 'lowestMark')
+  }
+]
+
+const courseGradeColumns = [
+  {
+    title: 'Student ID',
+    dataIndex: 'studentId',
+    sorter: (a: any, b: any) => compareRecords(a, b, 'studentId')
+  },
+  {
+    title: 'Full Name',
+    dataIndex: 'studentName',
+    render: (_: any, grade: any) => {
+      return (
+        <span className={grade.studentId === '' ? 'font-bold' : ''}>
+          {grade.studentName}
+        </span>
+      )
+    },
+    sorter: (a: any, b: any) => compareRecords(a, b, 'studentName')
+  },
+  {
+    title: 'Final Mark',
+    dataIndex: 'finalMark',
+    render: (_: any, grade: any) => {
+      return (
+        <span className={grade.studentId === '' ? 'font-bold' : ''}>
+          {grade.finalMark}
+        </span>
+      )
+    },
+    sorter: (a: any, b: any) => compareRecords(a, b, 'finalMark')
+  },
+  {
+    title: 'Final Grade',
+    dataIndex: 'finalGrade',
+    render: (_: any, grade: any) => {
+      return (
+        <span className={grade.studentId === '' ? 'font-bold' : ''}>
+          {grade.finalGrade}
+        </span>
+      )
+    },
+    sorter: (a: any, b: any) => compareRecords(a, b, 'finalGrade')
+  }
+]
+
+const studentGradeColumns = [
+  {
+    title: 'Course',
+    dataIndex: 'course',
+    width: '40%'
+  },
+  {
+    title: 'Final Mark',
+    dataIndex: 'finalMark',
+    render: (_: any, grade: any) => {
+      return (
+        <span className={grade.studentId === '' ? 'font-bold' : ''}>
+          {grade.finalMark}
+        </span>
+      )
+    },
+    sorter: (a: any, b: any) => compareRecords(a, b, 'finalMark')
+  },
+  {
+    title: 'Final Grade',
+    dataIndex: 'finalGrade',
+    render: (_: any, grade: any) => {
+      return (
+        <span className={grade.studentId === '' ? 'font-bold' : ''}>
+          {grade.finalGrade}
+        </span>
+      )
+    },
+    sorter: (a: any, b: any) => compareRecords(a, b, 'finalGrade')
+  },
+  {
+    title: 'Class Average',
+    dataIndex: 'classAverage',
+    render: (_: any, grade: any) => {
+      return (
+        <span className={grade.studentId === '' ? 'font-bold' : ''}>
+          {grade.classAverage}
+        </span>
+      )
+    },
+    sorter: (a: any, b: any) => compareRecords(a, b, 'classAverage')
+  }
+]
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function Reports(props: { role: string }) {
@@ -56,9 +193,10 @@ function Reports(props: { role: string }) {
         .map((cl: any) => {
           return { label: cl.class.toUpperCase(), value: cl.class }
         })
-        .sort(
-          (a: any, b: any) =>
-            Number(a.value.slice(2)) - Number(b.value.slice(2))
+        .sort((a: any, b: any) =>
+          a.value.slice(0, 2) === b.value.slice(0, 2)
+            ? Number(a.value.slice(2)) - Number(b.value.slice(2))
+            : compareString(a.value, b.value)
         )
     )
     setInitializing(false)
@@ -144,14 +282,65 @@ function Reports(props: { role: string }) {
           newStudent.children = <DetailedStudentPanel report={student} />
           return newStudent
         })
+        json.studentMarks = json.students
+          .filter((student: any) => student.marks.length > 0)
+          .map((student: any) => {
+            return {
+              key: student.id,
+              label: student.name,
+              children: (
+                <Table
+                  bordered
+                  className="my-2"
+                  columns={studentGradeColumns}
+                  dataSource={student.marks.map((mark: any) => {
+                    mark.key = mark.course
+                    return mark
+                  })}
+                  pagination={{ hideOnSinglePage: true, defaultPageSize: 100 }}
+                  scroll={{ x: 500, y: 500 }}
+                />
+              )
+            }
+          })
+        json.courseMarks = json.marks.map((course: any) => {
+          return {
+            key: course.course,
+            label: course.course,
+            children: (
+              <Table
+                bordered
+                className="my-2"
+                columns={courseGradeColumns}
+                dataSource={course.students.map((student: any) => {
+                  student.key = student.studentId
+                  return student
+                })}
+                pagination={{ hideOnSinglePage: true, defaultPageSize: 100 }}
+                scroll={{ x: 500, y: 500 }}
+              />
+            )
+          }
+        })
         delete json.students
+        delete json.marks
       } else {
-        json.classesTable = json.classes.sort(
-          (a: any, b: any) =>
-            Number(a.class.slice(2)) - Number(b.class.slice(2))
+        json.classesTable = json.classes.sort((a: any, b: any) =>
+          a.class.slice(0, 2) === b.class.slice(0, 2)
+            ? Number(a.class.slice(2)) - Number(b.class.slice(2))
+            : compareString(a.class, b.class)
         )
+
         json.classesList = json.classes
+          .sort((a: any, b: any) =>
+            a.class.slice(0, 2) === b.class.slice(0, 2)
+              ? Number(a.class.slice(2)) - Number(b.class.slice(2))
+              : compareString(a.class, b.class)
+          )
           .map((cl: any) => {
+            cl.marks =
+              json.classesMarks.find((cm: any) => cl.class === cm.class)
+                ?.courses ?? []
             const newClass: any = {
               key: cl.class,
               label: cl.class.toUpperCase()
@@ -159,9 +348,50 @@ function Reports(props: { role: string }) {
             newClass.children = <ClassPanel cl={cl} />
             return newClass
           })
-          .sort(
-            (a: any, b: any) => Number(a.key.slice(2)) - Number(b.key.slice(2))
+        json.classesMarks = json.classesMarks
+          .map((cm: any) => {
+            return {
+              key: cm.class,
+              label: cm.class.toUpperCase(),
+              children: (
+                <Table
+                  bordered
+                  className="my-2"
+                  columns={classGradeStatsColumns}
+                  dataSource={cm.courses.map((mark: any) => {
+                    mark.key = mark.course
+                    return mark
+                  })}
+                  pagination={{ hideOnSinglePage: true, defaultPageSize: 100 }}
+                  scroll={{ x: true, y: 500 }}
+                />
+              )
+            }
+          })
+          .sort((a: any, b: any) =>
+            a.key.slice(0, 2) === b.key.slice(0, 2)
+              ? Number(a.key.slice(2)) - Number(b.key.slice(2))
+              : compareString(a.key, b.key)
           )
+        json.coursesMarks = json.coursesMarks.map((cm: any) => {
+          return {
+            key: cm.course,
+            label: cm.course,
+            children: (
+              <Table
+                bordered
+                className="my-2"
+                columns={courseGradeStatsColumns}
+                dataSource={cm.classes.map((cl: any) => {
+                  cl.key = cl.class
+                  return cl
+                })}
+                pagination={{ hideOnSinglePage: true, defaultPageSize: 100 }}
+                scroll={{ x: true, y: 500 }}
+              />
+            )
+          }
+        })
         delete json.classes
       }
       messageApi.success('Successfully generated reports.')

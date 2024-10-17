@@ -146,7 +146,7 @@ function Cform() {
       </div>
       <Table
         bordered
-        className="mt-4 overflow-x-scroll"
+        className="mt-4"
         columns={columns}
         dataSource={dates}
         loading={loading}

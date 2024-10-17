@@ -108,7 +108,6 @@ function App() {
           // Seed Token
           colorPrimary: '#3b7273',
           colorLink: '#3b7273',
-          colorInfo: '#3b7273',
           colorBorder: '#3b7273',
           colorBorderSecondary: '#3b7273',
           colorBgContainerDisabled: '#ffffff',

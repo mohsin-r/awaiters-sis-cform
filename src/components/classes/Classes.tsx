@@ -82,7 +82,7 @@ function Classes() {
       </div>
       <Table
         bordered
-        className="mt-4 overflow-x-scroll"
+        className="mt-4"
         columns={columns}
         dataSource={classes}
         loading={loading}

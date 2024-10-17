@@ -290,7 +290,7 @@ const PersonTable = (props: {
     <Form form={form} component={false}>
       <Table
         loading={props.loading}
-        className="mt-4 overflow-x-scroll"
+        className="mt-4"
         components={{
           body: {
             cell: EditableCell
