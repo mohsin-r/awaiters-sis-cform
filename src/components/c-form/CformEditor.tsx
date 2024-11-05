@@ -530,9 +530,9 @@ export default function CformEditor(props: any) {
           </Space>
           <h3>Teachers</h3>
           <Form.List name="teachers">
-            {(fields) => (
+            {(fields: any[]) => (
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                {fields.map((field, index) => (
+                {fields.map((field: { key: any; name: any }, index: number) => (
                   <Card
                     size="small"
                     title={teachers[index].name}
@@ -577,9 +577,9 @@ export default function CformEditor(props: any) {
           </Form.List>
           <h3>Students</h3>
           <Form.List name="students">
-            {(fields) => (
+            {(fields: any[]) => (
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                {fields.map((field, index) => (
+                {fields.map((field: { key: any; name: any }, index: number) => (
                   <Card
                     size="small"
                     title={students[index].name}

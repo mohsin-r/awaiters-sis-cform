@@ -21,6 +21,14 @@ import Reports from 'components/reports/Reports'
 import Holidays from 'components/holidays/Holidays'
 import Classes from 'components/classes/Classes'
 import NotFound from 'components/NotFound'
+import 'styles.css'
+import dayjs from 'dayjs'
+import advancedFormat from 'dayjs/plugin/advancedFormat'
+import customParseFormat from 'dayjs/plugin/customParseFormat'
+import localeData from 'dayjs/plugin/localeData'
+import weekday from 'dayjs/plugin/weekday'
+import weekOfYear from 'dayjs/plugin/weekOfYear'
+import weekYear from 'dayjs/plugin/weekYear'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function RequireAuth(props: { class: string | undefined; children: any }) {
@@ -55,6 +63,12 @@ function App() {
   const [started, setStarted] = useState(false)
   useEffect(() => {
     if (import.meta.env.VITE_DOWN === 'false') {
+      dayjs.extend(customParseFormat)
+      dayjs.extend(advancedFormat)
+      dayjs.extend(weekday)
+      dayjs.extend(localeData)
+      dayjs.extend(weekOfYear)
+      dayjs.extend(weekYear)
       fetch(`${host}/check-session`, {
         // @ts-expect-error TS BEING DUMB
         headers: {
