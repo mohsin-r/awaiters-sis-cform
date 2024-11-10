@@ -156,7 +156,6 @@ export default function HolidayEditor(props: {
 
   const handleCancel = () => {
     setOpen(false)
-    form.resetFields()
   }
 
   const onCheckboxChange = (e: any) => {
