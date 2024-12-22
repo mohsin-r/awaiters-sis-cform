@@ -18,10 +18,16 @@ import Class, {
 } from 'components/reports/Class'
 import Student from 'components/reports/Student'
 import All, { ClassPanel } from 'components/reports/All'
+import ClassDocument from 'components/reports/documents/Class'
+import StudentDocument from 'components/reports/documents/Student'
+import AllDocument from 'components/reports/documents/All'
 import { DetailedStudentPanel } from 'components/reports/Student'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { host, getCookie, compareRecords, compareString } from 'utils'
+import { DownloadOutlined } from '@ant-design/icons'
+import { saveAs } from 'file-saver'
+import { pdf } from '@react-pdf/renderer'
 
 const courseGradeStatsColumns = [
   {
@@ -164,6 +170,7 @@ function Reports(props: { role: string }) {
   const [initializing, setInitializing] = useState(props.role === 'admin')
   const [classes, setClasses] = useState([] as any[])
   const [loading, setLoading] = useState(false)
+  const [downloading, setDownloading] = useState(false)
   const [loaded, setLoaded] = useState(false)
   const [type, setType] = useState('')
   const [generatedType, setGeneratedType] = useState('')
@@ -175,7 +182,22 @@ function Reports(props: { role: string }) {
     { value: 'student', label: 'Student' }
   ]
   if (props.role === 'admin') {
-    reportTypeOpts.push({ value: 'all', label: 'All Classes' })
+    reportTypeOpts.push({ value: 'all-classes', label: 'All Classes' })
+  }
+
+  const typeToDoc: { [key: string]: any } = {
+    class: <ClassDocument report={result} />,
+    student: <StudentDocument report={result} />,
+    'all-classes': <AllDocument report={result} />
+  }
+
+  const downloadPdf = async () => {
+    setDownloading(true)
+    const doc = typeToDoc[generatedType]
+    const asPdf = pdf(doc) // {} is important, throws without an argument
+    const blob = await asPdf.toBlob()
+    saveAs(blob, `${generatedType}-report.pdf`)
+    setTimeout(() => setDownloading(false), 1000)
   }
 
   const loadClasses = async () => {
@@ -227,8 +249,8 @@ function Reports(props: { role: string }) {
       reqParams.to = values.to.format('YYYY-MM-DD')
     }
     const url =
-      values.type === 'all'
-        ? `${host}/reports/${values.type}?`
+      values.type === 'all-classes'
+        ? `${host}/reports/all?`
         : `${host}/${
             props.role === 'admin' ? values.class : params.section
           }/reports/${values.type}?`
@@ -373,6 +395,7 @@ function Reports(props: { role: string }) {
               ? Number(a.key.slice(2)) - Number(b.key.slice(2))
               : compareString(a.key, b.key)
           )
+        json.marksTables = json.coursesMarks
         json.coursesMarks = json.coursesMarks.map((cm: any) => {
           return {
             key: cm.course,
@@ -452,7 +475,7 @@ function Reports(props: { role: string }) {
           >
             <Select options={reportTypeOpts} onChange={onTypeChange} />
           </Form.Item>
-          {props.role === 'admin' && type !== 'all' && (
+          {props.role === 'admin' && type !== 'all-classes' && (
             <Form.Item
               label="Class"
               name="class"
@@ -488,21 +511,33 @@ function Reports(props: { role: string }) {
             <DatePicker size="large" className="w-full" />
           </Form.Item>
         </Space>
-        <Form.Item className="mt-2">
-          <Button
-            loading={loading}
-            type="primary"
-            htmlType="submit"
-            className=""
-          >
-            {loading ? 'Generating...' : 'Generate'}
-          </Button>
-        </Form.Item>
+        <Flex className="my-8 mt-2" gap={8} align="center">
+          <Form.Item className="mb-0">
+            <Button
+              loading={loading}
+              type="primary"
+              htmlType="submit"
+              className=""
+            >
+              {loading ? 'Generating...' : 'Generate'}
+            </Button>
+          </Form.Item>
+          {loaded && (
+            <Button
+              loading={downloading}
+              onClick={downloadPdf}
+              type="primary"
+              icon={<DownloadOutlined />}
+            >
+              {downloading ? 'Downloading...' : 'Download As PDF'}
+            </Button>
+          )}
+        </Flex>
       </Form>
       <Divider className="mb-2 mt-0" />
       {loaded && generatedType === 'class' && <Class report={result} />}
       {loaded && generatedType === 'student' && <Student report={result} />}
-      {loaded && generatedType === 'all' && <All report={result} />}
+      {loaded && generatedType === 'all-classes' && <All report={result} />}
     </div>
   )
 }

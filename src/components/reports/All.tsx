@@ -38,6 +38,7 @@ export function ClassPanel(props: { cl: ClassType }) {
       </Descriptions>
       {props.cl.marks.length > 0 && (
         <Collapse
+          className="mt-4"
           items={[
             {
               key: 'marks',
