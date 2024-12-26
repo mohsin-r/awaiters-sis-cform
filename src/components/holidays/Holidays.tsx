@@ -130,7 +130,7 @@ function Holidays() {
         return holiday
       })
     )
-    console.log(json)
+    // console.log(json)
     setLoading(false)
   }
 

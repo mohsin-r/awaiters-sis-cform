@@ -44,7 +44,7 @@ function Grades() {
       credentials: 'include'
     })
     const json = await res.json()
-    console.log(json)
+    // console.log(json)
     setCourses(
       json.courses.map((course: any) => {
         const grades = json.grades[course.code].map((grade: any) => {

@@ -265,7 +265,7 @@ function Reports(props: { role: string }) {
     messageApi.destroy()
     if (res.status === 200) {
       const json = await res.json()
-      console.log(json)
+      // console.log(json)
       if (values.type === 'class') {
         json.coverageList = json.coverage.map((cov: any) => {
           const newCoverage: any = { key: cov.subject, label: cov.subject }

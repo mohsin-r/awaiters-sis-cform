@@ -6,7 +6,8 @@ import {
   CoffeeOutlined,
   ExceptionOutlined,
   LogoutOutlined,
-  GroupOutlined
+  GroupOutlined,
+  DownloadOutlined
 } from '@ant-design/icons'
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -42,6 +43,11 @@ function AdminNavbar(props: any) {
       icon: <ExceptionOutlined />
     },
     {
+      label: 'Downloads',
+      key: 'downloads',
+      icon: <DownloadOutlined />
+    },
+    {
       label: 'Logout',
       key: 'logout',
       icon: <LogoutOutlined />
@@ -55,6 +61,8 @@ function AdminNavbar(props: any) {
       return 'classes'
     } else if (location.pathname.includes('reports')) {
       return 'reports'
+    } else if (location.pathname.includes('downloads')) {
+      return 'downloads'
     } else {
       return ''
     }

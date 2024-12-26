@@ -19,6 +19,7 @@ import Teachers from 'components/teachers/Teachers'
 import Grades from 'components/grades/Grades'
 import Reports from 'components/reports/Reports'
 import Holidays from 'components/holidays/Holidays'
+import Downloads from 'components/downloads/Downloads'
 import Classes from 'components/classes/Classes'
 import NotFound from 'components/NotFound'
 import 'styles.css'
@@ -209,7 +210,7 @@ function App() {
                   <Route path="classes" element={<Classes />} />
                 </>
               )}
-
+              <Route path="downloads" element={<Downloads role={role} />} />
               <Route path="reports" element={<Reports role={role} />} />
               <Route path="*" element={<NotFound />} />
             </Route>

@@ -58,8 +58,8 @@ export default function HolidayEditor(props: {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleSubmit = async (values: any) => {
-    console.log('Submitted form.')
-    console.log(values)
+    // console.log('Submitted form.')
+    // console.log(values)
     setLoading(true)
     const newHoliday: any = {
       startDate: multi
@@ -88,7 +88,7 @@ export default function HolidayEditor(props: {
           throw new Error()
         })
         .then((json) => {
-          console.log(json)
+          // console.log(json)
           if (json) {
             messageApi.success(`Holiday added successfully.`)
             props.setHolidays([

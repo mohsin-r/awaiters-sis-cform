@@ -1,3 +1,7 @@
 .ant-table-wrapper .ant-table {
   scrollbar-color: unset;
 }
+
+.ant-collapse > .ant-collapse-item > .ant-collapse-header {
+  align-items: center;
+}

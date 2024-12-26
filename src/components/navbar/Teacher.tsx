@@ -8,7 +8,8 @@ import {
   DatabaseOutlined,
   ExceptionOutlined,
   CheckSquareOutlined,
-  UserOutlined
+  UserOutlined,
+  DownloadOutlined
 } from '@ant-design/icons'
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -54,6 +55,11 @@ function TeacherNavbar(props: any) {
       icon: <ExceptionOutlined />
     },
     {
+      label: 'Downloads',
+      key: 'downloads',
+      icon: <DownloadOutlined />
+    },
+    {
       label: 'Logout',
       key: 'logout',
       icon: <LogoutOutlined />
@@ -71,6 +77,8 @@ function TeacherNavbar(props: any) {
       return 'grades'
     } else if (location.pathname.includes('reports')) {
       return 'reports'
+    } else if (location.pathname.includes('downloads')) {
+      return 'downloads'
     } else {
       return ''
     }
@@ -88,6 +96,8 @@ function TeacherNavbar(props: any) {
       navigate(`/${params.section}/grades`)
     } else if (e.key === 'reports') {
       navigate(`/${params.section}/reports`)
+    } else if (e.key === 'downloads') {
+      navigate(`/${params.section}/downloads`)
     } else {
       const request = new Request(`${host}/logout`, {
         method: 'post',
