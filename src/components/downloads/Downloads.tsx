@@ -58,7 +58,7 @@ export default function Downloads(props: { role: string }) {
       )
       const allClassesStudents: any = {}
       for (let i = 0; i < classes.length; i += 1) {
-        const res = await fetch(`${host}/${classes[i].class}/reports/student`, {
+        const res = await fetch(`${host}/${classes[i].class}/people/student`, {
           // @ts-expect-error TS BEING DUMB
           headers: {
             'Content-Type': 'application/json',
@@ -66,7 +66,7 @@ export default function Downloads(props: { role: string }) {
           },
           credentials: 'include'
         })
-        const students = (await res.json()).students.map((student: any) => ({
+        const students = (await res.json()).map((student: any) => ({
           id: student.id,
           name: student.name,
           selected: true
@@ -77,7 +77,7 @@ export default function Downloads(props: { role: string }) {
       // console.log(allClassesStudents)
     } else {
       // not in admin mode, get students list for that class
-      const res = await fetch(`${host}/${params.section}/reports/student`, {
+      const res = await fetch(`${host}/${params.section}/people/student`, {
         // @ts-expect-error TS BEING DUMB
         headers: {
           'Content-Type': 'application/json',
@@ -85,7 +85,7 @@ export default function Downloads(props: { role: string }) {
         },
         credentials: 'include'
       })
-      const students = (await res.json()).students.map((student: any) => ({
+      const students = (await res.json()).map((student: any) => ({
         id: student.id,
         name: student.name,
         selected: true

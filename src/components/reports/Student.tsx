@@ -126,6 +126,7 @@ export function DetailedStudentPanel(props: { report: StudentType }) {
       </Descriptions>
       {props.report.marks.length > 0 && (
         <Collapse
+          className="mt-4"
           items={[
             {
               key: 'marks',
@@ -195,36 +196,13 @@ export default function Student(props: { report: any }) {
                   pagination={{ hideOnSinglePage: true, defaultPageSize: 100 }}
                   scroll={{ x: 1500, y: 500 }}
                 />
-                {(props.report.studentMarks.length > 0 ||
-                  props.report.courseMarks.length > 0) && (
+                {props.report.studentMarks.length > 0 && (
                   <>
                     <h3 className="my-0">Course Marks</h3>
-                    <Tabs
-                      defaultActiveKey="1"
-                      items={[
-                        {
-                          label: 'By Student',
-                          key: '1',
-                          children: (
-                            <Collapse
-                              className="mb-4 mt-2"
-                              items={props.report.studentMarks}
-                              size="large"
-                            />
-                          )
-                        },
-                        {
-                          label: 'By Course',
-                          key: '2',
-                          children: (
-                            <Collapse
-                              className="mb-4 mt-2"
-                              items={props.report.courseMarks}
-                              size="large"
-                            />
-                          )
-                        }
-                      ]}
+                    <Collapse
+                      className="mb-4 mt-2"
+                      items={props.report.studentMarks}
+                      size="large"
                     />
                   </>
                 )}

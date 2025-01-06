@@ -144,7 +144,7 @@ export default function StudentDocument(props: { report: any }) {
                 <Text
                   key={mark}
                   style={{ marginTop: '1px' }}
-                >{`${mark.course}: ${mark.finalMark} (${mark.finalGrade})`}</Text>
+                >{`${mark.course}: ${mark.finalMark} (${mark.finalGrade}). Class Average: ${mark.classAverage}`}</Text>
               ))}
             </View>
           </View>

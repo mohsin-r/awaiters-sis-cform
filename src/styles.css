@@ -5,3 +5,7 @@
 .ant-collapse > .ant-collapse-item > .ant-collapse-header {
   align-items: center;
 }
+
+.ant-select-dropdown .ant-select-item-option-content {
+  white-space: pre-wrap;
+}

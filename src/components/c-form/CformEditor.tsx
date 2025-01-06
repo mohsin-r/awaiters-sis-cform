@@ -13,7 +13,8 @@ import {
   Spin,
   Flex,
   Typography,
-  message
+  message,
+  Select
 } from 'antd'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -27,10 +28,9 @@ interface Student {
   present: boolean
   late: number
   ayahs: number
-  quranHomework: boolean
-  ideologyHomework: boolean
-  historyHomework: boolean
-  akhlaqHomework: boolean
+  homework: string
+  absenceExcused?: boolean
+  lateExcused?: boolean
   visible: boolean
   new?: boolean
 }
@@ -41,6 +41,8 @@ interface Teacher {
   name: string
   present: boolean
   late: number
+  absenceExcused?: boolean
+  lateExcused?: boolean
   visible: boolean
   new?: boolean
 }
@@ -201,10 +203,9 @@ export default function CformEditor(props: any) {
       student.present = true
       if (type === 'student') {
         student.ayahs = 0
-        student.quranHomework = true
-        student.ideologyHomework = true
-        student.historyHomework = true
-        student.akhlaqHomework = true
+        student.homework = 'yes'
+        student.absenceExcused = false
+        student.lateExcused = false
       }
       student.visible = true
       return student
@@ -337,6 +338,7 @@ export default function CformEditor(props: any) {
   }
 
   const handleSubmit = async (values: any) => {
+    console.log(values)
     setSubmitting(true)
     messageApi.open({
       duration: 0,
@@ -350,6 +352,24 @@ export default function CformEditor(props: any) {
     if (values.end) {
       values.end = values.end.format('h:mm a')
     }
+    values.students = values.students.map((student: any) => {
+      if (student.present) {
+        student.absenceExcused = false
+      }
+      if (student.late <= 0) {
+        student.lateExcused = false
+      }
+      return student
+    })
+    values.teachers = values.teachers.map((teacher: any) => {
+      if (teacher.present) {
+        teacher.absenceExcused = false
+      }
+      if (teacher.late <= 0) {
+        teacher.lateExcused = false
+      }
+      return teacher
+    })
     if (props.mode === 'new') {
       const coverageAdded = await addCoverage(values)
       const progressAdded =
@@ -389,6 +409,26 @@ export default function CformEditor(props: any) {
         )
         setSubmitting(false)
       }
+    }
+  }
+
+  const onPresentToggle = (type: string, index: number) => {
+    const copy: any = type === 'student' ? [...students] : [...teachers]
+    copy[index].present = !copy[index].present
+    if (type === 'student') {
+      setStudents(copy)
+    } else {
+      setTeachers(copy)
+    }
+  }
+
+  const onLateInput = (type: string, index: number, value: any) => {
+    const copy: any = type === 'student' ? [...students] : [...teachers]
+    copy[index].late = value
+    if (type === 'student') {
+      setStudents(copy)
+    } else {
+      setTeachers(copy)
     }
   }
 
@@ -453,6 +493,7 @@ export default function CformEditor(props: any) {
           id="cform"
           disabled={props.mode === 'view' || submitting}
           form={form}
+          className="mb-4"
           autoComplete="off"
           size="large"
           layout="horizontal"
@@ -531,7 +572,7 @@ export default function CformEditor(props: any) {
           <h3>Teachers</h3>
           <Form.List name="teachers">
             {(fields: any[]) => (
-              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
                 {fields.map((field: { key: any; name: any }, index: number) => (
                   <Card
                     size="small"
@@ -559,8 +600,22 @@ export default function CformEditor(props: any) {
                         teachers[index].visible ? '' : 'invisible'
                       }`}
                     >
-                      <Checkbox />
+                      <Checkbox
+                        onChange={() => onPresentToggle('teacher', index)}
+                      />
                     </Form.Item>
+                    {!teachers[index].present && (
+                      <Form.Item
+                        label="Absence Excused"
+                        name={[field.name, 'absenceExcused']}
+                        valuePropName="checked"
+                        className={`mb-0 ${
+                          teachers[index].visible ? '' : 'invisible'
+                        }`}
+                      >
+                        <Checkbox />
+                      </Form.Item>
+                    )}
                     <Form.Item
                       label="Minutes Late"
                       name={[field.name, 'late']}
@@ -568,8 +623,22 @@ export default function CformEditor(props: any) {
                         teachers[index].visible ? '' : 'invisible'
                       }`}
                     >
-                      <InputNumber />
+                      <InputNumber
+                        onChange={(val) => onLateInput('teacher', index, val)}
+                      />
                     </Form.Item>
+                    {teachers[index].late > 0 && (
+                      <Form.Item
+                        label="Late Excused"
+                        name={[field.name, 'lateExcused']}
+                        valuePropName="checked"
+                        className={`mb-0 ${
+                          teachers[index].visible ? '' : 'invisible'
+                        }`}
+                      >
+                        <Checkbox />
+                      </Form.Item>
+                    )}
                   </Card>
                 ))}
               </div>
@@ -578,7 +647,7 @@ export default function CformEditor(props: any) {
           <h3>Students</h3>
           <Form.List name="students">
             {(fields: any[]) => (
-              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
                 {fields.map((field: { key: any; name: any }, index: number) => (
                   <Card
                     size="small"
@@ -606,8 +675,22 @@ export default function CformEditor(props: any) {
                         students[index].visible ? '' : 'invisible'
                       }`}
                     >
-                      <Checkbox />
+                      <Checkbox
+                        onChange={() => onPresentToggle('student', index)}
+                      />
                     </Form.Item>
+                    {!students[index].present && (
+                      <Form.Item
+                        label="Absence Excused"
+                        name={[field.name, 'absenceExcused']}
+                        valuePropName="checked"
+                        className={`mb-0 ${
+                          students[index].visible ? '' : 'invisible'
+                        }`}
+                      >
+                        <Checkbox />
+                      </Form.Item>
+                    )}
                     <Form.Item
                       label="Minutes Late"
                       name={[field.name, 'late']}
@@ -615,10 +698,24 @@ export default function CformEditor(props: any) {
                         students[index].visible ? '' : 'invisible'
                       }`}
                     >
-                      <InputNumber />
+                      <InputNumber
+                        onChange={(val) => onLateInput('student', index, val)}
+                      />
                     </Form.Item>
+                    {students[index].late > 0 && (
+                      <Form.Item
+                        label="Late Excused"
+                        name={[field.name, 'lateExcused']}
+                        valuePropName="checked"
+                        className={`mb-0 ${
+                          students[index].visible ? '' : 'invisible'
+                        }`}
+                      >
+                        <Checkbox />
+                      </Form.Item>
+                    )}
                     <Form.Item
-                      className={`mb-0 ${
+                      className={`mb-2 ${
                         students[index].visible ? '' : 'invisible'
                       }`}
                       label="Ayaat Recited"
@@ -627,44 +724,19 @@ export default function CformEditor(props: any) {
                       <InputNumber />
                     </Form.Item>
                     <Form.Item
-                      label="Quran/Arabic H/W Complete"
-                      name={[field.name, 'quranHomework']}
-                      valuePropName="checked"
-                      className={`mb-0 ${
+                      label="Homework"
+                      name={[field.name, 'homework']}
+                      className={`mb-0 w-56 max-w-full ${
                         students[index].visible ? '' : 'invisible'
                       }`}
                     >
-                      <Checkbox />
-                    </Form.Item>
-                    <Form.Item
-                      label="Ideology H/W Complete"
-                      name={[field.name, 'ideologyHomework']}
-                      valuePropName="checked"
-                      className={`mb-0 ${
-                        students[index].visible ? '' : 'invisible'
-                      }`}
-                    >
-                      <Checkbox />
-                    </Form.Item>
-                    <Form.Item
-                      label="History H/W Complete"
-                      name={[field.name, 'historyHomework']}
-                      valuePropName="checked"
-                      className={`mb-0 ${
-                        students[index].visible ? '' : 'invisible'
-                      }`}
-                    >
-                      <Checkbox />
-                    </Form.Item>
-                    <Form.Item
-                      label="Akhlaq H/W Complete"
-                      name={[field.name, 'akhlaqHomework']}
-                      valuePropName="checked"
-                      className={`mb-0 ${
-                        students[index].visible ? '' : 'invisible'
-                      }`}
-                    >
-                      <Checkbox />
+                      <Select
+                        options={[
+                          { value: 'yes', label: 'Done' },
+                          { value: 'partial', label: 'Partially Done' },
+                          { value: 'no', label: 'Not Done' }
+                        ]}
+                      />
                     </Form.Item>
                   </Card>
                 ))}

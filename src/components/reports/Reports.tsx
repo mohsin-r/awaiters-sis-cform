@@ -77,50 +77,6 @@ const classGradeStatsColumns = [
   }
 ]
 
-const courseGradeColumns = [
-  {
-    title: 'Student ID',
-    dataIndex: 'studentId',
-    sorter: (a: any, b: any) => compareRecords(a, b, 'studentId')
-  },
-  {
-    title: 'Full Name',
-    dataIndex: 'studentName',
-    render: (_: any, grade: any) => {
-      return (
-        <span className={grade.studentId === '' ? 'font-bold' : ''}>
-          {grade.studentName}
-        </span>
-      )
-    },
-    sorter: (a: any, b: any) => compareRecords(a, b, 'studentName')
-  },
-  {
-    title: 'Final Mark',
-    dataIndex: 'finalMark',
-    render: (_: any, grade: any) => {
-      return (
-        <span className={grade.studentId === '' ? 'font-bold' : ''}>
-          {grade.finalMark}
-        </span>
-      )
-    },
-    sorter: (a: any, b: any) => compareRecords(a, b, 'finalMark')
-  },
-  {
-    title: 'Final Grade',
-    dataIndex: 'finalGrade',
-    render: (_: any, grade: any) => {
-      return (
-        <span className={grade.studentId === '' ? 'font-bold' : ''}>
-          {grade.finalGrade}
-        </span>
-      )
-    },
-    sorter: (a: any, b: any) => compareRecords(a, b, 'finalGrade')
-  }
-]
-
 const studentGradeColumns = [
   {
     title: 'Course',
@@ -325,27 +281,7 @@ function Reports(props: { role: string }) {
               )
             }
           })
-        json.courseMarks = json.marks.map((course: any) => {
-          return {
-            key: course.course,
-            label: course.course,
-            children: (
-              <Table
-                bordered
-                className="my-2"
-                columns={courseGradeColumns}
-                dataSource={course.students.map((student: any) => {
-                  student.key = student.studentId
-                  return student
-                })}
-                pagination={{ hideOnSinglePage: true, defaultPageSize: 100 }}
-                scroll={{ x: 500, y: 500 }}
-              />
-            )
-          }
-        })
         delete json.students
-        delete json.marks
       } else {
         json.classesTable = json.classes.sort((a: any, b: any) =>
           a.class.slice(0, 2) === b.class.slice(0, 2)
