@@ -6,6 +6,7 @@ import {
   Checkbox,
   Collapse,
   DatePicker,
+  Empty,
   Flex,
   Form,
   message,
@@ -15,7 +16,7 @@ import {
 } from 'antd'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { compareString, getCookie, host } from 'utils'
+import { compareString, getCookie, host, prefixLength } from 'utils'
 import JSZip from 'jszip'
 import TranscriptDocument from './documents/transcript'
 import EngagementDocument from './documents/engagement-report'
@@ -35,6 +36,7 @@ export default function Downloads(props: { role: string }) {
   const [classes, setClasses] = useState([] as Array<string>)
   const [excludedNames, setExcludedNames] = useState([] as Array<string>)
   const [totalStudents, setTotalStudents] = useState(0)
+  const [studentsExist, setStudentsExist] = useState(false)
   const completedStudents = useTrait(0)
   const params = useParams()
 
@@ -51,8 +53,8 @@ export default function Downloads(props: { role: string }) {
         classes
           .map((cl: { class: string; day: string }) => cl.class)
           .sort((a: string, b: string) =>
-            a.slice(0, 2) === b.slice(0, 2)
-              ? Number(a.slice(2)) - Number(b.slice(2))
+            a.slice(0, prefixLength) === b.slice(0, prefixLength)
+              ? Number(a.slice(prefixLength)) - Number(b.slice(prefixLength))
               : compareString(a, b)
           )
       )
@@ -73,6 +75,11 @@ export default function Downloads(props: { role: string }) {
         }))
         allClassesStudents[classes[i].class] = students
       }
+      setStudentsExist(
+        Object.keys(allClassesStudents).some(
+          (cl: string) => allClassesStudents[cl].length > 0
+        )
+      )
       setStudentsObj(allClassesStudents)
       // console.log(allClassesStudents)
     } else {
@@ -90,6 +97,7 @@ export default function Downloads(props: { role: string }) {
         name: student.name,
         selected: true
       }))
+      setStudentsExist(students.length > 0)
       setStudentsList(students)
       // console.log(students)
     }
@@ -218,14 +226,16 @@ export default function Downloads(props: { role: string }) {
         const downloadBlob = await downloadFolder.generateAsync({
           type: 'blob'
         })
-        setExcludedNames(newExcludedStudents)
         setLoading(false)
         setLoaded(true)
-        const filename =
-          values.type === 'transcripts'
-            ? 'Transcripts'
-            : 'Student Engagement Reports'
-        saveAs(downloadBlob, `${filename}.zip`)
+        setExcludedNames(newExcludedStudents)
+        if (newExcludedStudents.length !== totalStudents) {
+          const filename =
+            values.type === 'transcripts'
+              ? 'Transcripts'
+              : 'Student Engagement Reports'
+          saveAs(downloadBlob, `${filename}.zip`)
+        }
       } else {
         messageApi.error(
           'No students are selected. Please select at least one student.'
@@ -282,11 +292,13 @@ export default function Downloads(props: { role: string }) {
           })
           setLoading(false)
           setLoaded(true)
-          const filename =
-            values.type === 'transcripts'
-              ? 'Transcripts'
-              : 'Student Engagement Reports'
-          saveAs(downloadBlob, `${filename}.zip`)
+          if (newExcludedStudents.length < totalStudents) {
+            const filename =
+              values.type === 'transcripts'
+                ? 'Transcripts'
+                : 'Student Engagement Reports'
+            saveAs(downloadBlob, `${filename}.zip`)
+          }
         } else {
           messageApi.error(
             'An error occurred when generating the files. Please report this error.'
@@ -349,6 +361,13 @@ export default function Downloads(props: { role: string }) {
         <h3 className="m-0 p-0">Loading...</h3>
       </Flex>
     )
+  } else if (!studentsExist) {
+    return (
+      <Flex gap="small" vertical className="absolute h-full w-full">
+        <h2 className="mx-4 mb-0 mt-4 basis-[38%]">Downloads</h2>
+        <Empty description="No Students Available" />
+      </Flex>
+    )
   }
   return (
     <div className="mx-4 mt-4 flex flex-col">
@@ -388,7 +407,26 @@ export default function Downloads(props: { role: string }) {
           showIcon
         />
       )}
-      {loaded && (
+      {loaded && excludedNames.length === totalStudents && (
+        <Alert
+          className="mt-4"
+          type="warning"
+          message="Warning!"
+          description={
+            <div>
+              <span>
+                Your files could not be downloaded because there{' '}
+                {type === 'transcripts'
+                  ? 'were no marks present for any student.'
+                  : 'was no data for any selected student in the selected dates.'}
+                .
+              </span>{' '}
+            </div>
+          }
+          showIcon
+        />
+      )}
+      {loaded && excludedNames.length < totalStudents && (
         <Alert
           className="mt-4"
           type="success"

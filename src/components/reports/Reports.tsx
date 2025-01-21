@@ -24,7 +24,13 @@ import AllDocument from 'components/reports/documents/All'
 import { DetailedStudentPanel } from 'components/reports/Student'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { host, getCookie, compareRecords, compareString } from 'utils'
+import {
+  host,
+  getCookie,
+  compareRecords,
+  compareString,
+  prefixLength
+} from 'utils'
 import { DownloadOutlined } from '@ant-design/icons'
 import { saveAs } from 'file-saver'
 import { pdf } from '@react-pdf/renderer'
@@ -172,8 +178,9 @@ function Reports(props: { role: string }) {
           return { label: cl.class.toUpperCase(), value: cl.class }
         })
         .sort((a: any, b: any) =>
-          a.value.slice(0, 2) === b.value.slice(0, 2)
-            ? Number(a.value.slice(2)) - Number(b.value.slice(2))
+          a.value.slice(0, prefixLength) === b.value.slice(0, prefixLength)
+            ? Number(a.value.slice(prefixLength)) -
+              Number(b.value.slice(prefixLength))
             : compareString(a.value, b.value)
         )
     )
@@ -284,15 +291,17 @@ function Reports(props: { role: string }) {
         delete json.students
       } else {
         json.classesTable = json.classes.sort((a: any, b: any) =>
-          a.class.slice(0, 2) === b.class.slice(0, 2)
-            ? Number(a.class.slice(2)) - Number(b.class.slice(2))
+          a.class.slice(0, prefixLength) === b.class.slice(0, prefixLength)
+            ? Number(a.class.slice(prefixLength)) -
+              Number(b.class.slice(prefixLength))
             : compareString(a.class, b.class)
         )
 
         json.classesList = json.classes
           .sort((a: any, b: any) =>
-            a.class.slice(0, 2) === b.class.slice(0, 2)
-              ? Number(a.class.slice(2)) - Number(b.class.slice(2))
+            a.class.slice(0, prefixLength) === b.class.slice(0, prefixLength)
+              ? Number(a.class.slice(prefixLength)) -
+                Number(b.class.slice(prefixLength))
               : compareString(a.class, b.class)
           )
           .map((cl: any) => {
@@ -327,8 +336,9 @@ function Reports(props: { role: string }) {
             }
           })
           .sort((a: any, b: any) =>
-            a.key.slice(0, 2) === b.key.slice(0, 2)
-              ? Number(a.key.slice(2)) - Number(b.key.slice(2))
+            a.key.slice(0, prefixLength) === b.key.slice(0, prefixLength)
+              ? Number(a.key.slice(prefixLength)) -
+                Number(b.key.slice(prefixLength))
               : compareString(a.key, b.key)
           )
         json.marksTables = json.coursesMarks

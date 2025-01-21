@@ -36,4 +36,6 @@ export function compareRecords(a: any, b: any, field: string) {
   return compareString(a[field], b[field])
 }
 
+export const prefixLength = import.meta.env.VITE_GENDER === 'brothers' ? 2 : 1
+
 export const host = import.meta.env.VITE_API_HOST

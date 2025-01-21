@@ -79,7 +79,9 @@ function Login(props: any) {
     <div className="flex h-screen flex-col items-center justify-center rounded-lg text-[#3b7273]">
       {contextHolder}
       <img src={logo} className="h-20"></img>
-      <h1 className="text-center">Login to the SIS and C-Form</h1>
+      <h1 className="text-center">
+        Login to the SIS system for {import.meta.env.VITE_GENDER}
+      </h1>
       <Form
         disabled={loading}
         size="large"

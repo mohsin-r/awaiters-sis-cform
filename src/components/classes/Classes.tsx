@@ -1,8 +1,7 @@
 import { Table } from 'antd'
 import type { TableProps } from 'antd'
 import { useEffect, useState } from 'react'
-import { host } from 'utils'
-import AddClass from './AddClass'
+import { compareString, host, prefixLength } from 'utils'
 
 interface AwClass {
   key: string
@@ -21,7 +20,10 @@ function Classes() {
       defaultSortOrder: 'ascend',
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       sorter: (a: any, b: any) => {
-        return Number(a.class.slice(2)) - Number(b.class.slice(2))
+        return a.class.slice(0, prefixLength) === b.class.slice(0, prefixLength)
+          ? Number(a.class.slice(prefixLength)) -
+              Number(b.class.slice(prefixLength))
+          : compareString(a.class, b.class)
       }
     },
     {
@@ -33,8 +35,16 @@ function Classes() {
       render: (_, cl: AwClass) => {
         return (
           <a
-            href={`https://awaiters-sis-cform.netlify.app/${cl.class.toLowerCase()}/login`}
-          >{`https://awaiters-sis-cform.netlify.app/${cl.class.toLowerCase()}/login`}</a>
+            href={`https://${
+              import.meta.env.VITE_GENDER === 'brothers'
+                ? 'awaiters-sis-cform'
+                : 'awaiters-sisters-sis'
+            }.netlify.app/${cl.class.toLowerCase()}/login`}
+          >{`https://${
+            import.meta.env.VITE_GENDER === 'brothers'
+              ? 'awaiters-sis-cform'
+              : 'awaiters-sisters-sis'
+          }.netlify.app/${cl.class.toLowerCase()}/login`}</a>
         )
       }
     }
@@ -78,7 +88,6 @@ function Classes() {
     <div className="mx-4 mt-4">
       <div className="flex items-center">
         <h2 className="m-0">Classes</h2>
-        <AddClass classes={classes} setClasses={setClasses} />
       </div>
       <Table
         bordered
