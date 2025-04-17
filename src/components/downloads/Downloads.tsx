@@ -231,7 +231,6 @@ export default function Downloads(props: { role: string }) {
         setLoaded(true)
         setExcludedNames(newExcludedStudents)
         if (newExcludedStudents.length !== numStudents) {
-          console.log('I am here')
           const filename =
             values.type === 'transcripts'
               ? 'Transcripts'
