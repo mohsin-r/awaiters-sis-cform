@@ -338,7 +338,6 @@ export default function CformEditor(props: any) {
   }
 
   const handleSubmit = async (values: any) => {
-    console.log(values)
     setSubmitting(true)
     messageApi.open({
       duration: 0,

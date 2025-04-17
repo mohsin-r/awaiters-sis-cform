@@ -32,6 +32,7 @@ interface StudentType {
   classesAttended: number
   totalAyahs: number
   marks: string | Array<string>
+  events: string | Array<string>
 }
 
 export function CoveragePanel(props: { coverage: CoverageType }) {
@@ -94,11 +95,24 @@ export function StudentPanel(props: { student: StudentType }) {
           {props.student.totalAyahs}
         </Descriptions.Item>
       </Descriptions>
-      <Descriptions column={{ xs: 1, sm: 1, md: 1, lg: 2, xl: 3, xxl: 3 }}>
+      <Descriptions
+        className="mt-4"
+        column={{ xs: 1, sm: 1, md: 1, lg: 2, xl: 3, xxl: 3 }}
+      >
         <Descriptions.Item label="Course Marks">
           {Array.isArray(props.student.marks)
             ? props.student.marks.join(', ')
             : props.student.marks}
+        </Descriptions.Item>
+      </Descriptions>
+      <Descriptions
+        className="mt-4"
+        column={{ xs: 1, sm: 1, md: 1, lg: 2, xl: 3, xxl: 3 }}
+      >
+        <Descriptions.Item label="Events Attended">
+          {Array.isArray(props.student.events)
+            ? props.student.events.join(', ')
+            : props.student.events}
         </Descriptions.Item>
       </Descriptions>
     </div>
@@ -259,8 +273,29 @@ export default function Class(props: { report: any }) {
             ))}
           </Flex>
         )
-      },
-      sorter: (a: any, b: any) => compareRecords(a, b, 'totalAyahs')
+      }
+    },
+    {
+      title: 'Events Attended',
+      dataIndex: 'events',
+      render: (_: any, student: StudentType) => {
+        return !Array.isArray(student.events) ? (
+          <span className={student.id === '' ? 'font-bold' : ''}>
+            {student.events}
+          </span>
+        ) : (
+          <Flex vertical>
+            {(student.events as Array<string>).map((event) => (
+              <span
+                key={event}
+                className={student.id === '' ? 'font-bold' : ''}
+              >
+                {event}
+              </span>
+            ))}
+          </Flex>
+        )
+      }
     }
   ]
   const collapseItems: CollapseProps['items'] = [

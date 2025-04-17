@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Collapse, Descriptions, Table, TableProps, Tabs } from 'antd'
-import { compareRecords, compareString } from 'utils'
+import { Collapse, Descriptions, Table, TableProps, Tabs, Tag } from 'antd'
+import { compareRecords, compareString, typeToColour } from 'utils'
 import LatePenalty from './LatePenalty'
 
 interface StudentType {
@@ -19,6 +19,13 @@ interface StudentType {
     finalMark: string
     finalGrade: string
     classAverage: string
+  }>
+  events: Array<{
+    name: string
+    date: string
+    type: string
+    start?: string
+    end?: string
   }>
 }
 
@@ -89,6 +96,76 @@ const studentColumns: TableProps<StudentType>['columns'] = [
   }
 ]
 
+function ExtraStudentCollapse(props: { report: StudentType }) {
+  if (props.report.marks.length === 0 && props.report.events.length === 0) {
+    return <></>
+  }
+  const collapseItems = []
+  if (props.report.marks.length > 0) {
+    collapseItems.push({
+      key: 'marks',
+      label: 'Course Marks',
+      children: (
+        <Collapse
+          items={props.report.marks.map((mark) => {
+            return {
+              key: mark.course,
+              label: mark.course,
+              children: (
+                <Descriptions
+                  column={{ xs: 1, sm: 2, md: 3, lg: 3, xl: 3, xxl: 3 }}
+                >
+                  <Descriptions.Item label="Final Mark">
+                    {mark.finalMark}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Final Grade">
+                    {mark.finalGrade}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Class Average">
+                    {mark.classAverage}
+                  </Descriptions.Item>
+                </Descriptions>
+              )
+            }
+          })}
+        />
+      )
+    })
+  }
+  if (props.report.events.length > 0) {
+    collapseItems.push({
+      key: 'events',
+      label: 'Events Attended',
+      children: (
+        <Collapse
+          items={props.report.events.map((event) => {
+            return {
+              key: event.name,
+              label: event.name,
+              children: (
+                <Descriptions
+                  column={{ xs: 1, sm: 2, md: 3, lg: 3, xl: 3, xxl: 3 }}
+                >
+                  <Descriptions.Item label="Type">
+                    <Tag color={typeToColour[event.type]}>{event.type}</Tag>
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Date">
+                    {event.date}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Time">
+                    {event.start ?? ''} to {event.end ?? ''}
+                  </Descriptions.Item>
+                </Descriptions>
+              )
+            }
+          })}
+        />
+      )
+    })
+  }
+  return <Collapse items={collapseItems} className="mt-4" />
+}
+
 export function DetailedStudentPanel(props: { report: StudentType }) {
   return (
     <>
@@ -124,42 +201,7 @@ export function DetailedStudentPanel(props: { report: StudentType }) {
           {props.report.averageAyahs}
         </Descriptions.Item>
       </Descriptions>
-      {props.report.marks.length > 0 && (
-        <Collapse
-          className="mt-4"
-          items={[
-            {
-              key: 'marks',
-              label: 'Course Marks',
-              children: (
-                <Collapse
-                  items={props.report.marks.map((mark) => {
-                    return {
-                      key: mark.course,
-                      label: mark.course,
-                      children: (
-                        <Descriptions
-                          column={{ xs: 1, sm: 2, md: 3, lg: 3, xl: 3, xxl: 3 }}
-                        >
-                          <Descriptions.Item label="Final Mark">
-                            {mark.finalMark}
-                          </Descriptions.Item>
-                          <Descriptions.Item label="Final Grade">
-                            {mark.finalGrade}
-                          </Descriptions.Item>
-                          <Descriptions.Item label="Class Average">
-                            {mark.classAverage}
-                          </Descriptions.Item>
-                        </Descriptions>
-                      )
-                    }
-                  })}
-                />
-              )
-            }
-          ]}
-        />
-      )}
+      <ExtraStudentCollapse report={props.report} />
     </>
   )
 }
@@ -202,6 +244,16 @@ export default function Student(props: { report: any }) {
                     <Collapse
                       className="mb-4 mt-2"
                       items={props.report.studentMarks}
+                      size="large"
+                    />
+                  </>
+                )}
+                {props.report.studentEvents.length > 0 && (
+                  <>
+                    <h3 className="my-0">Events Attended</h3>
+                    <Collapse
+                      className="mb-4 mt-2"
+                      items={props.report.studentEvents}
                       size="large"
                     />
                   </>

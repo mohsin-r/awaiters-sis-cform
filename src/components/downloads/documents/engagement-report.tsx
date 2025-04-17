@@ -7,6 +7,7 @@ import {
   Image,
   StyleSheet
 } from '@react-pdf/renderer'
+import DocumentTable from 'components/reports/documents/DocumentTable'
 
 // Create styles
 const styles = StyleSheet.create({
@@ -51,6 +52,57 @@ const styles = StyleSheet.create({
     paddingTop: '3px'
   }
 })
+
+const marksColumns: Array<any> = [
+  {
+    title: 'Course',
+    key: 'course',
+    width: '25%'
+  },
+  {
+    title: 'Final Mark',
+    key: 'finalMark',
+    width: '25%%'
+  },
+  {
+    title: 'Final Grade',
+    key: 'finalGrade',
+    width: '25%%'
+  },
+  {
+    title: 'Class Average',
+    key: 'classAverage',
+    width: '25%%'
+  }
+]
+
+const eventsColumns: Array<any> = [
+  {
+    title: 'Name',
+    key: 'name',
+    width: '25%'
+  },
+  {
+    title: 'Type',
+    key: 'type',
+    width: '25%%'
+  },
+  {
+    title: 'Date',
+    key: 'date',
+    width: '25%%'
+  },
+  {
+    title: 'Time',
+    key: 'start',
+    render: (row: any) => (
+      <Text>
+        {row.start} to {row.end}
+      </Text>
+    ),
+    width: '25%%'
+  }
+]
 
 // Create Document Component
 export default function EngagementDocument(props: { report: any }) {
@@ -129,6 +181,52 @@ export default function EngagementDocument(props: { report: any }) {
           </Text>
           <Text>{props.report.student.averageAyahs}</Text>
         </View>
+        <Text style={styles.subtitle}>Course Marks</Text>
+        {props.report.student.marks.length > 0 && (
+          <DocumentTable
+            data={props.report.student.marks.map((mark: any) => {
+              mark.key = mark.course
+              return mark
+            })}
+            columns={marksColumns}
+            marginTop={20}
+          />
+        )}
+        {props.report.student.marks.length === 0 && (
+          <Text
+            style={{
+              marginTop: '20px',
+              fontFamily: `Helvetica`,
+              fontSize: '12px'
+            }}
+          >
+            There are no grades to report because no courses have been completed
+            yet by this student.
+          </Text>
+        )}
+        <Text style={styles.subtitle}>Events Attended</Text>
+        {props.report.student.events.length > 0 && (
+          <DocumentTable
+            data={props.report.student.events.map((event: any) => {
+              event.key = JSON.stringify(event)
+              return event
+            })}
+            columns={eventsColumns}
+            marginTop={20}
+          />
+        )}
+        {props.report.student.events.length === 0 && (
+          <Text
+            style={{
+              marginTop: '20px',
+              fontFamily: `Helvetica`,
+              fontSize: '12px'
+            }}
+          >
+            There are no events to report because no events have been attended
+            yet by this student.
+          </Text>
+        )}
       </Page>
     </Document>
   )

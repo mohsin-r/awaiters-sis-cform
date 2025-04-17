@@ -5,6 +5,7 @@ interface Column {
   title: string
   key: string
   width: string | number
+  render?: (data: any) => React.ReactNode
 }
 
 export default function DocumentTable(props: {
@@ -66,7 +67,9 @@ export default function DocumentTable(props: {
                   colIndex === props.columns.length - 1 ? 0 : '1px solid black'
               }}
             >
-              {Array.isArray(data[col.key]) ? (
+              {col.render ? (
+                col.render(data)
+              ) : Array.isArray(data[col.key]) ? (
                 data[col.key].map((line: string) => (
                   <Text
                     key={line}

@@ -144,6 +144,24 @@ const studentMarksColumns: Array<any> = [
   }
 ]
 
+const studentEventsColumns: Array<any> = [
+  {
+    title: 'Student ID',
+    key: 'id',
+    width: '15%'
+  },
+  {
+    title: 'Full Name',
+    key: 'name',
+    width: '15%'
+  },
+  {
+    title: 'Events Attended',
+    key: 'events',
+    width: '70%'
+  }
+]
+
 // Create Document Component
 export default function ClassDocument(props: { report: any }) {
   return (
@@ -212,6 +230,14 @@ export default function ClassDocument(props: { report: any }) {
           columns={studentMarksColumns}
           marginTop={20}
           summaryRow
+        />
+        <DocumentTable
+          data={props.report.studentsTable.slice(
+            0,
+            props.report.studentsTable.length - 1
+          )}
+          columns={studentEventsColumns}
+          marginTop={20}
         />
       </Page>
     </Document>

@@ -147,6 +147,18 @@ export default function StudentDocument(props: { report: any }) {
                 >{`${mark.course}: ${mark.finalMark} (${mark.finalGrade}). Class Average: ${mark.classAverage}`}</Text>
               ))}
             </View>
+            <View
+              style={student.events.length === 0 ? styles.field : styles.marks}
+            >
+              <Text style={{ color: '#808080' }}>Events Attended: </Text>
+              {student.events.length === 0 && <Text>No Events Attended</Text>}
+              {student.events.map((event: any) => (
+                <Text
+                  key={event}
+                  style={{ marginTop: '1px' }}
+                >{`${event.name}. Type: ${event.type}. Date & Time: ${event.date} from ${event.start} to ${event.end}.`}</Text>
+              ))}
+            </View>
           </View>
         ))}
       </Page>

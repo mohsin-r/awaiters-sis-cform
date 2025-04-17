@@ -135,6 +135,7 @@ export default function Downloads(props: { role: string }) {
   const computeTotalStudents = (values: any) => {
     if (props.role === 'admin') {
       let n = 0
+      console.log(values)
       classes.forEach((cl: string) => {
         n += values[cl].filter((student: any) => student.selected).length
       })
@@ -185,6 +186,7 @@ export default function Downloads(props: { role: string }) {
             })
             if (res.status === 200) {
               const reports = await res.json()
+              console.log('Reports:', reports)
               delete reports.marks
               reports.students = reports.students
                 .filter((student: any) => {
@@ -543,7 +545,7 @@ export default function Downloads(props: { role: string }) {
           <Collapse
             size="middle"
             className="mt-4"
-            defaultActiveKey={[...Array(10).keys()]}
+            defaultActiveKey={[...Array(classes.length).keys()]}
             items={classes.map((cl: string, idx: number) => ({
               key: idx,
               label: (

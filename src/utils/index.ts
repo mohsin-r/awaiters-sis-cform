@@ -39,3 +39,13 @@ export function compareRecords(a: any, b: any, field: string) {
 export const prefixLength = import.meta.env.VITE_GENDER === 'brothers' ? 2 : 1
 
 export const host = import.meta.env.VITE_API_HOST
+
+export const typeToColour: any = {
+  'Annual Day': 'green',
+  Picnic: 'processing',
+  'Sports Event': 'success',
+  Retreat: 'purple',
+  'Special Class': 'warning',
+  'Teacher Training (TTC)': 'geekblue',
+  Other: 'red'
+}

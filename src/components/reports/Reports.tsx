@@ -9,7 +9,8 @@ import {
   message,
   Flex,
   Spin,
-  Table
+  Table,
+  Tag
 } from 'antd'
 import Class, {
   CoveragePanel,
@@ -29,7 +30,8 @@ import {
   getCookie,
   compareRecords,
   compareString,
-  prefixLength
+  prefixLength,
+  typeToColour
 } from 'utils'
 import { DownloadOutlined } from '@ant-design/icons'
 import { saveAs } from 'file-saver'
@@ -124,6 +126,43 @@ const studentGradeColumns = [
       )
     },
     sorter: (a: any, b: any) => compareRecords(a, b, 'classAverage')
+  }
+]
+
+const studentEventColumns: Array<any> = [
+  {
+    title: 'Name',
+    dataIndex: 'name',
+    key: 'name',
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    sorter: (a: any, b: any) =>
+      compareString(a.name.toLowerCase(), b.name.toLowerCase())
+  },
+  {
+    title: 'Type',
+    key: 'type',
+    sorter: (a: any, b: any) =>
+      compareString(a.type.toLowerCase(), b.type.toLowerCase()),
+    render: (_: any, record: any) => (
+      <Tag color={typeToColour[record.type]}>{record.type}</Tag>
+    )
+  },
+  {
+    title: 'Date',
+    dataIndex: 'date',
+    key: 'date',
+    defaultSortOrder: 'descend',
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    sorter: (a: any, b: any) =>
+      compareString(a.date.toLowerCase(), b.date.toLowerCase())
+  },
+  {
+    title: 'Time',
+    key: 'time',
+    render: (_: any, record: any) =>
+      !record.start && !record.end
+        ? 'Not Provided'
+        : `${record.start ?? ''} to ${record.end ?? ''}`
   }
 ]
 
@@ -228,7 +267,7 @@ function Reports(props: { role: string }) {
     messageApi.destroy()
     if (res.status === 200) {
       const json = await res.json()
-      // console.log(json)
+      console.log(json)
       if (values.type === 'class') {
         json.coverageList = json.coverage.map((cov: any) => {
           const newCoverage: any = { key: cov.subject, label: cov.subject }
@@ -281,6 +320,27 @@ function Reports(props: { role: string }) {
                   dataSource={student.marks.map((mark: any) => {
                     mark.key = mark.course
                     return mark
+                  })}
+                  pagination={{ hideOnSinglePage: true, defaultPageSize: 100 }}
+                  scroll={{ x: 500, y: 500 }}
+                />
+              )
+            }
+          })
+        json.studentEvents = json.students
+          .filter((student: any) => student.events.length > 0)
+          .map((student: any) => {
+            return {
+              key: student.id,
+              label: student.name,
+              children: (
+                <Table
+                  bordered
+                  className="my-2"
+                  columns={studentEventColumns}
+                  dataSource={student.events.map((event: any) => {
+                    event.key = JSON.stringify(event)
+                    return event
                   })}
                   pagination={{ hideOnSinglePage: true, defaultPageSize: 100 }}
                   scroll={{ x: 500, y: 500 }}

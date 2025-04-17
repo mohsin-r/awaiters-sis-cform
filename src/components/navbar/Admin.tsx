@@ -7,7 +7,8 @@ import {
   ExceptionOutlined,
   LogoutOutlined,
   GroupOutlined,
-  DownloadOutlined
+  DownloadOutlined,
+  RadarChartOutlined
 } from '@ant-design/icons'
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -31,6 +32,11 @@ function AdminNavbar(props: any) {
       label: 'Classes',
       key: 'classes',
       icon: <GroupOutlined />
+    },
+    {
+      label: 'Events',
+      key: 'events',
+      icon: <RadarChartOutlined />
     },
     {
       label: 'Holidays',
@@ -59,6 +65,8 @@ function AdminNavbar(props: any) {
       return 'holidays'
     } else if (location.pathname.includes('classes')) {
       return 'classes'
+    } else if (location.pathname.includes('events')) {
+      return 'events'
     } else if (location.pathname.includes('reports')) {
       return 'reports'
     } else if (location.pathname.includes('downloads')) {
