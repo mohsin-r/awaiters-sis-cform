@@ -61,7 +61,7 @@ function Login(props: any) {
   }
 
   const onFinishFailed = (errorInfo: any) => {
-    console.log('Failed:', errorInfo)
+    // console.log('Failed:', errorInfo)
   }
 
   type FieldType = {

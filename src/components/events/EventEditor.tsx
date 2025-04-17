@@ -47,7 +47,7 @@ export default function EventEditor(props: { mode: string }) {
         credentials: 'include'
       })
       event = await res.json()
-      console.log(event)
+      // console.log(event)
       setName(event.name)
       if (event.description) {
         setDescription(event.description)
@@ -108,7 +108,7 @@ export default function EventEditor(props: { mode: string }) {
       )
     )
     setStudentsObj(allClassesStudents)
-    console.log(allClassesStudents)
+    // console.log(allClassesStudents)
     setInitializing(false)
   }
 
@@ -194,7 +194,7 @@ export default function EventEditor(props: { mode: string }) {
         )
       }
     }
-    console.log(payload)
+    // console.log(payload)
     if (props.mode === 'new') {
       const eventAdded = await addEvent(payload)
       messageApi.destroy()

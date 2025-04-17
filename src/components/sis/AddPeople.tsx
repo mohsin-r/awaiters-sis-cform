@@ -112,7 +112,7 @@ export default function AddPerson(props: {
       .catch((error) => {
         messageApi.error(`Failed to add ${props.type}.`)
         setLoading(false)
-        console.log(error)
+        // console.log(error)
       })
   }
 

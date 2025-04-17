@@ -81,7 +81,7 @@ function App() {
         credentials: 'include'
       })
         .then((res) => {
-          // console.log("The status is", res.status)
+          // // console.log("The status is", res.status)
           if (res.status === 200) {
             return res.json()
           } else {

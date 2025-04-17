@@ -169,7 +169,6 @@ export default function AllDocument(props: { report: any }) {
               <Text>{course.course}</Text>
             </View>
             <DocumentTable
-              cellPadding={3}
               data={course.classes.map((cl: any) => {
                 cl.class = cl.class.toUpperCase()
                 return cl

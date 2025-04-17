@@ -81,7 +81,7 @@ export default function Downloads(props: { role: string }) {
         )
       )
       setStudentsObj(allClassesStudents)
-      // console.log(allClassesStudents)
+      // // console.log(allClassesStudents)
     } else {
       // not in admin mode, get students list for that class
       const res = await fetch(`${host}/${params.section}/people/student`, {
@@ -99,7 +99,7 @@ export default function Downloads(props: { role: string }) {
       }))
       setStudentsExist(students.length > 0)
       setStudentsList(students)
-      // console.log(students)
+      // // console.log(students)
     }
     setInitializing(false)
   }
@@ -109,7 +109,7 @@ export default function Downloads(props: { role: string }) {
     studentData: any,
     type: string
   ) => {
-    // console.log(studentData)
+    // // console.log(studentData)
     const meta: any = { class: studentData.class, day: studentData.day }
     if (type !== 'transcripts') {
       meta.from = studentData.from
@@ -117,7 +117,7 @@ export default function Downloads(props: { role: string }) {
     }
     for (let i = 0; i < studentData.students.length; i += 1) {
       const student = studentData.students[i]
-      // console.log('Working on student:', student.name)
+      // // console.log('Working on student:', student.name)
       const doc =
         type === 'transcripts' ? (
           <TranscriptDocument report={{ ...meta, student }} />
@@ -128,14 +128,14 @@ export default function Downloads(props: { role: string }) {
       const blob = await asPdf.toBlob()
       zip.file(`${student.id}-${student.name}.pdf`, blob)
       completedStudents.set(completedStudents.get() + 1)
-      // console.log(completedStudents.get())
+      // // console.log(completedStudents.get())
     }
   }
 
   const computeTotalStudents = (values: any) => {
     if (props.role === 'admin') {
       let n = 0
-      console.log(values)
+      // console.log(values)
       classes.forEach((cl: string) => {
         n += values[cl].filter((student: any) => student.selected).length
       })
@@ -148,7 +148,7 @@ export default function Downloads(props: { role: string }) {
   }
 
   const fetchData = async (values: any) => {
-    // console.log(values)
+    // // console.log(values)
     completedStudents.set(0)
     setExcludedNames([])
     setLoaded(false)
@@ -167,14 +167,14 @@ export default function Downloads(props: { role: string }) {
           values[cl].some((student: any) => student.selected)
         )
       ) {
-        // console.log('At least one student is selected.')
+        // // console.log('At least one student is selected.')
         setLoading(true)
         const newExcludedStudents: Array<string> = []
         const downloadFolder = new JSZip()
         for (let i = 0; i < classes.length; i += 1) {
           const cl = classes[i]
           if (values[cl].some((student: any) => student.selected)) {
-            // console.log('Results for class:', cl)
+            // // console.log('Results for class:', cl)
             const url = `${host}/${cl}/reports/student?`
             const res = await fetch(url + new URLSearchParams(reqParams), {
               // @ts-expect-error TS BEING DUMB
@@ -186,7 +186,7 @@ export default function Downloads(props: { role: string }) {
             })
             if (res.status === 200) {
               const reports = await res.json()
-              console.log('Reports:', reports)
+              // console.log('Reports:', reports)
               delete reports.marks
               reports.students = reports.students
                 .filter((student: any) => {

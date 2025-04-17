@@ -68,7 +68,7 @@ export default function AddClass(props: {
       .catch((error) => {
         messageApi.error(`Failed to add class.`)
         setLoading(false)
-        console.log(error)
+        // console.log(error)
       })
   }
 
