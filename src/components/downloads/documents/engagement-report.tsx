@@ -97,7 +97,7 @@ const eventsColumns: Array<any> = [
     key: 'start',
     render: (row: any) => (
       <Text>
-        {row.start} to {row.end}
+        {row.start ?? 'Not Provided'} to {row.end ?? 'Not Provided'}
       </Text>
     ),
     width: '25%%'
@@ -213,6 +213,7 @@ export default function EngagementDocument(props: { report: any }) {
             })}
             columns={eventsColumns}
             marginTop={20}
+            cellPadding={5}
           />
         )}
         {props.report.student.events.length === 0 && (

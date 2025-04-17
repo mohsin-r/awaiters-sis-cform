@@ -175,6 +175,7 @@ export default function AllDocument(props: { report: any }) {
               })}
               columns={marksColumns}
               marginTop={0}
+              cellPadding={3}
             />
           </View>
         ))}

@@ -139,11 +139,9 @@ export default function Downloads(props: { role: string }) {
       classes.forEach((cl: string) => {
         n += values[cl].filter((student: any) => student.selected).length
       })
-      setTotalStudents(n)
+      return n
     } else {
-      setTotalStudents(
-        values.students.filter((student: any) => student.selected).length
-      )
+      return values.students.filter((student: any) => student.selected).length
     }
   }
 
@@ -152,7 +150,8 @@ export default function Downloads(props: { role: string }) {
     completedStudents.set(0)
     setExcludedNames([])
     setLoaded(false)
-    computeTotalStudents(values)
+    const numStudents = computeTotalStudents(values)
+    setTotalStudents(numStudents)
     const reqParams: any = {}
     if (values.from) {
       reqParams.from = values.from.format('YYYY-MM-DD')
@@ -231,7 +230,8 @@ export default function Downloads(props: { role: string }) {
         setLoading(false)
         setLoaded(true)
         setExcludedNames(newExcludedStudents)
-        if (newExcludedStudents.length !== totalStudents) {
+        if (newExcludedStudents.length !== numStudents) {
+          console.log('I am here')
           const filename =
             values.type === 'transcripts'
               ? 'Transcripts'
@@ -294,7 +294,7 @@ export default function Downloads(props: { role: string }) {
           })
           setLoading(false)
           setLoaded(true)
-          if (newExcludedStudents.length < totalStudents) {
+          if (newExcludedStudents.length < numStudents) {
             const filename =
               values.type === 'transcripts'
                 ? 'Transcripts'
