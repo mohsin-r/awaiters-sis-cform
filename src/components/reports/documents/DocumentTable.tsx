@@ -29,7 +29,7 @@ export default function DocumentTable(props: {
       wordBreak: 'break-word'
     },
     tbody: {
-      padding: `${props.cellPadding ?? 6}px`,
+      padding: `${props.cellPadding ?? 4}px`,
       borderRight: '1px solid black',
       fontSize: '11px'
     },
